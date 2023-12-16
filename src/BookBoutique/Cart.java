@@ -10,6 +10,10 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+/**
+ * Cart - class
+ * Creates a JFrame which is used as a cart.
+ */
 public class Cart extends JFrame {
 	private JPanel wrapper;
 	private HashMap<String, Livre> cartItems = new HashMap<String, Livre>();
@@ -33,6 +37,16 @@ public class Cart extends JFrame {
 		pack();
 	}
 	
+	/**
+	 * addToCart:
+	 * 		Adds the books added to the cart in Accueil
+	 * 		into a 'HashMap' which is used to display
+	 * 		the books the user selected.
+	 * @param book - the book selected by the user
+	 * This method creates a JPanel for each book selected
+	 * adds it to the wrapper 'JPanel', refreshes the display
+	 * and shows all the items selected.
+	 */
 	public void addToCart(Livre book) {
 		this.cartItems.put(book.title, book);
 		

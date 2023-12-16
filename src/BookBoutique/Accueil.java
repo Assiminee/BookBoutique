@@ -58,11 +58,11 @@ public class Accueil extends JPanel implements ActionListener
 	 */
 	private JPanel createJPanels()
 	{
+		HashMap<String, Livre> books = getBooks();
+		int i = 0;
 		wrapper = new JPanel();
 		wrapper.setLayout(new GridLayout(3, 4, 15, 15));
 		wrapper.setPreferredSize(new Dimension(700, 1000));
-		HashMap<String, Livre> books = getBooks();
-		int i = 0;
 		
 		for (String key : books.keySet()) {
 			articleCreator(books.get(key));
@@ -147,9 +147,10 @@ public class Accueil extends JPanel implements ActionListener
 	
 	/**
 	 * setContentHolder:
-	 * 		sets the 'JLabels' holding the 
-	 * @param cHolder
-	 * @param book
+	 * 		sets the 'JLabels' holding the book content 
+	 * @param cHolder - the 'JLabel' to hold the book data
+	 * @param book - an entry from the books 'HashMap'. The
+	 * data from this entry will be inserted into cHolder.
 	 */
 	private void setContentHolder(JLabel cHolder, Livre book)
 	{
@@ -162,6 +163,15 @@ public class Accueil extends JPanel implements ActionListener
 		cHolder.setHorizontalAlignment(JLabel.CENTER);
 	}
 	
+	/**
+	 * getBooks:
+	 * 		Populated the books 'HashMap' with the book
+	 * 		data. It does so by reading a CSV file and
+	 * 		inserting the data from the latter into the
+	 * 		HashMap
+	 * @return - the 'HashMap' filled with all the book
+	 * data in the CSV file.
+	 */
 	public HashMap<String, Livre> getBooks() {
 		String fileName = "src\\books.csv";
         BufferedReader reader = null;

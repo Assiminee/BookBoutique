@@ -1,5 +1,12 @@
 package BookBoutique;
 
+/**
+ * Livre - class
+ * Defines an instance of a book.
+ * This class is mainly supposed to
+ * be used a a data structure to hold
+ * book information.
+ */
 public class Livre {
 	public String title, picture, authName, synopsis;
 	public double price;
