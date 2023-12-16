@@ -39,7 +39,7 @@ public class Accueil extends JPanel implements ActionListener
 		setLayout(new FlowLayout());
 		
 		add(createJPanels());
-		add(Controlleur.scrollPane(wrapper, 1150, 440));
+		add(Controlleur.scrollPane(wrapper, 1200, 450));
 
 		setVisible(true);
 	}
@@ -60,14 +60,17 @@ public class Accueil extends JPanel implements ActionListener
 	{
 		HashMap<String, Livre> books = getBooks();
 		int i = 0;
+		int numRows = (int)Math.floorDiv(books.size(), 4);
 		wrapper = new JPanel();
-		wrapper.setLayout(new GridLayout(3, 4, 15, 15));
-		wrapper.setPreferredSize(new Dimension(700, 1000));
+		if (numRows % 4 != 0)
+			numRows++;
+		wrapper.setLayout(new GridLayout(numRows, 4, 15, 15));
+		//wrapper.setPreferredSize(new Dimension(700, 1000));
 		
 		for (String key : books.keySet()) {
 			articleCreator(books.get(key));
 			i++;
-			if (i == 12)
+			if (i == books.size())
 				break;
 		}
 
@@ -95,6 +98,7 @@ public class Accueil extends JPanel implements ActionListener
 		JButton addToCart = new JButton("Add to Cart");
 		JButton more = new JButton("More");
 		
+		article.setPreferredSize(new Dimension(100, 300));
 		article.setBorder(BorderFactory.createLineBorder(Color.black));
 		
 		setButtons(addToCart, book, "Add to cart");
@@ -139,7 +143,7 @@ public class Accueil extends JPanel implements ActionListener
 					Controlleur.cart.addToCart(book);
 				}
 				else {
-					System.out.println("Find out more about " + book.title);
+					System.out.println("Find out more about " + book.title + "\nGenre: " + book.genre);
 				}
 			}
 		});

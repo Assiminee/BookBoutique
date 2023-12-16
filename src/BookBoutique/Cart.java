@@ -62,7 +62,7 @@ public class Cart extends JFrame {
 		
 		ImageIcon bookImage = new ImageIcon(book.picture);
 		
-		imageHolder.setIcon(Controlleur.fixResolution(bookImage, 90, 140));
+		imageHolder.setIcon(Controlleur.fixResolution(bookImage, 100, 140));
 		bookInfo.setText("<HTML><P>" + book.title + "</P>"
 						   + "<P>" + book.authName + "</P>"
 						   + "<P>" + book.price + "</P><HTML>");

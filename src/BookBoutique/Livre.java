@@ -8,7 +8,7 @@ package BookBoutique;
  * book information.
  */
 public class Livre {
-	public String title, picture, authName, synopsis;
+	public String title, picture, authName, synopsis, genre;
 	public double price;
 	
 	public Livre(String[] args) {
@@ -16,6 +16,7 @@ public class Livre {
 		this.picture = args[1];
 		this.authName = args[2];
 		this.synopsis = args[3];
-		this.price = Double.parseDouble(args[4]);
+		this.genre = args[4];
+		this.price = Double.parseDouble(args[5]);
 	}
 }
