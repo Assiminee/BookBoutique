@@ -25,7 +25,7 @@ import javax.swing.JPanel;
  * Accueil is a JPanel that holds all of the components
  * placed at the center of the JFrame.
  */
-public class Accueil extends JPanel implements ActionListener
+public class Accueil extends JPanel
 {
 	// Class Attributes
 	public boolean showBooks;
@@ -207,12 +207,5 @@ public class Accueil extends JPanel implements ActionListener
             }
         }
         return data;
-	}
-
-
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
-		
 	}
 }
