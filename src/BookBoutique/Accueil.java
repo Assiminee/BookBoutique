@@ -143,7 +143,7 @@ public class Accueil extends JPanel
 					Controlleur.cart.addToCart(book);
 				}
 				else {
-					System.out.println("Find out more about " + book.title + "\nGenre: " + book.genre);
+					Controlleur.more.openMore(book);
 				}
 			}
 		});

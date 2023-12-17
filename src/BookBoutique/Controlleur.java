@@ -45,6 +45,7 @@ public class Controlleur extends JFrame implements ActionListener
 	private Accueil firstPage2 = new Accueil(false);
 	private FAQ faqPage = new FAQ();
 	static public Cart cart = new Cart();
+	static public More more = new More();
 	
 	public Controlleur()
 	{
