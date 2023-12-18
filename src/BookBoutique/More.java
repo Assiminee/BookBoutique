@@ -74,13 +74,17 @@ public class More extends JFrame implements ActionListener{
         ImageIcon bookPic = new ImageIcon(book.picture);
         picLabel.setIcon(Controlleur.fixResolution(bookPic, 250, 300));
         
+        StringBuffer gnr = new StringBuffer();
+        for(String gnre : book.genre) { gnr.append(gnre+", "); }
+        
         infoLabel.setText("<HTML><P><U>Title:</U> " + book.title + "</P>"
 				   + "<P><U>Auteur:</U> " + book.authName + "</P>"
 				   + "<P><U>Synopsis:</U> " + book.synopsis + "</P>"
+				   + "<P><U>Genre:</U> " + gnr.substring(0, gnr.length()-2) + "</P>"
 				   + "<P><U>Prix:</U> " + book.price + "</P><HTML>");
 				   
 		revalidate();
-		repaint();	
+		repaint();
 		setVisible(true);
 		pack();
 	}

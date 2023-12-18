@@ -40,12 +40,13 @@ public class Controlleur extends JFrame implements ActionListener
 	// Class Variables
 	static public ImageIcon logo = new ImageIcon("src\\Images\\books.png");
 	private JPanel innerPanel = new JPanel(new BorderLayout());
-	private JButton accueil, catalogue, login, search, FAQ, aboutUs;
+	public static JButton accueil, catalogue, login, search, FAQ, aboutUs;
 	private Accueil firstPage = new Accueil(true);
 	private Accueil firstPage2 = new Accueil(false);
 	private FAQ faqPage = new FAQ();
 	static public Cart cart = new Cart();
 	static public More more = new More();
+	static public Login lgn = new Login();
 	
 	public Controlleur()
 	{
@@ -292,17 +293,17 @@ public class Controlleur extends JFrame implements ActionListener
     public void actionPerformed(ActionEvent action)
 	{
         
-        if (action.getSource() == accueil) {
+		if (action.getSource() == accueil) {
         	removeAndAdd(firstPage);
         }
         else if (action.getSource() == catalogue) {
-        	removeAndAdd(firstPage2);
+        	
         }
         else if (action.getSource() == login) {
-        	removeAndAdd(firstPage);
+        	lgn.displayLogin();
         }
         else if (action.getSource() == search) {
-        	removeAndAdd(firstPage2);
+        	
         }
         else if (action.getSource() == FAQ) {
         	removeAndAdd(faqPage);
@@ -320,7 +321,7 @@ public class Controlleur extends JFrame implements ActionListener
 	 * @param name - a 'String to be displayed on
 	 * 		the 'JButton' when it is hovered over.
 	 */
-	private void onHover(JButton btn, String name) {
+	public static void onHover(JButton btn, String name) {
 		btn.addMouseListener(new MouseAdapter() {
 		    @Override
 		    public void mouseEntered(MouseEvent e) {
