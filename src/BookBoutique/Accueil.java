@@ -12,6 +12,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -30,17 +31,19 @@ public class Accueil extends JPanel
 	// Class Attributes
 	public boolean showBooks;
 	private JPanel wrapper;
+	private HashMap<String, Livre> books = getBooks();
+	private String[] bookKeys = books.keySet().toArray(new String[0]);
 	
 	public Accueil(boolean showBooks)
 	{
 		// Temp Variable for Testing
 		this.showBooks = showBooks;
 		
-		setLayout(new FlowLayout());
+		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		
-		add(createJPanels());
+		createJPanels();
+		browsingButtons();
 		add(Controlleur.scrollPane(wrapper, 1200, 450));
-
 		setVisible(true);
 	}
 	
@@ -56,25 +59,63 @@ public class Accueil extends JPanel
 	 * @return 'JPanel' returns wrapper after its been
 	 * populated with the 'JPanels' holding the content. 
 	 */
-	private JPanel createJPanels()
+	private void createJPanels()
 	{
-		HashMap<String, Livre> books = getBooks();
 		int i = 0;
 		int numRows = (int)Math.floorDiv(books.size(), 4);
 		wrapper = new JPanel();
 		if (numRows % 4 != 0)
 			numRows++;
-		wrapper.setLayout(new GridLayout(numRows, 4, 15, 15));
+		wrapper.setLayout(new GridLayout(3, 4, 15, 15));
 		//wrapper.setPreferredSize(new Dimension(700, 1000));
 		
-		for (String key : books.keySet()) {
-			articleCreator(books.get(key));
-			i++;
-			if (i == books.size())
+		for (; i < 12; i++) {
+			if (i >= books.size())
 				break;
+			Livre currBook = books.get(bookKeys[i]);
+			articleCreator(currBook);
 		}
-
-		return wrapper;
+	}
+	
+	
+	private void editDisplay(int btnNum) {
+		int k = 0;
+		int j = btnNum * 12;
+		for (int i = j - 12; i < j; i++) {
+			if (i >= bookKeys.length)
+				break;
+			Livre currBook = books.get(bookKeys[i]);
+			final Livre buttonBook = currBook;
+			JPanel article = (JPanel) wrapper.getComponent(k);
+			
+			JLabel contentHolder = (JLabel) article.getComponent(0);
+			JPanel buttonHolder = (JPanel) article.getComponent(1);
+			
+			JButton addToCart = (JButton) buttonHolder.getComponent(0);
+			JButton more = (JButton) buttonHolder.getComponent(1);
+			
+			setContentHolder(contentHolder, currBook);
+			setButtons(addToCart, buttonBook, "Add to cart");
+			setButtons(more, buttonBook, "more");
+			k++;
+		}
+	}
+	
+	private void browsingButtons() {
+		JPanel buttons = new JPanel();
+		buttons.setLayout(new BoxLayout(buttons, BoxLayout.X_AXIS));
+		for (int j = 0; j < (int)Math.floorDiv(books.size(), 12) + 1; j++) {
+			final int buttonIndex = j;
+			JButton btn = new JButton(Integer.toString(j + 1));
+			btn.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					editDisplay(buttonIndex + 1);
+				}
+			});
+			buttons.add(btn);
+		}
+		add(buttons);
 	}
 	
 	/**
@@ -100,7 +141,7 @@ public class Accueil extends JPanel
 		
 		article.setPreferredSize(new Dimension(100, 300));
 		article.setBorder(BorderFactory.createLineBorder(Color.black));
-		
+				
 		setButtons(addToCart, book, "Add to cart");
 		setButtons(more, book, "more");
 		
@@ -136,17 +177,22 @@ public class Accueil extends JPanel
 		btn.setBackground(new Color(0x732d21));
 		btn.setFocusable(false);
 		btn.setForeground(Color.WHITE);
-		btn.addActionListener(new ActionListener() {
+		ActionListener[] actionsToRemove = btn.getActionListeners();
+		for (ActionListener action : actionsToRemove) {
+			btn.removeActionListener(action);
+		}
+		ActionListener btnActionListener = new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (name == "Add to cart") {
+				if (name.equals("Add to cart")) {
 					Controlleur.cart.addToCart(book);
 				}
 				else {
 					Controlleur.more.openMore(book);
 				}
 			}
-		});
+		};
+		btn.addActionListener(btnActionListener);
 	}
 	
 	/**

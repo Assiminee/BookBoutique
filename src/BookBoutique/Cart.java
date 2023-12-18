@@ -20,21 +20,27 @@ import javax.swing.border.BevelBorder;
  * Cart - class
  * Creates a JFrame which is used as a cart.
  */
-public class Cart extends JFrame {
+public class Cart extends JFrame
+{
 	private double total;
 	private double selected;
+	
 	private JLabel totalPriceLabel;
 	private JLabel selectedItemsLabel;
 	private JPanel wrapper;
-	private HashMap<String, Livre> cartItems;
+	
+	private HashMap<Livre, Integer> cartItems;
 	private HashMap<String, Livre> selectedItems;
+	private HashMap<Livre, JLabel> displayedBooks;
 	
 	public Cart() {
 		
 		this.total = 0.00;
 		this.selected = 0.00;
-		this.cartItems = new HashMap<String, Livre>();
+		
+		this.cartItems = new HashMap<Livre, Integer>();
 		this.selectedItems = new HashMap<String, Livre>();
+		this.displayedBooks = new HashMap<Livre, JLabel>();
 		
 		setLayout(new BorderLayout());
 		setIconImage(Controlleur.logo.getImage());
@@ -86,55 +92,79 @@ public class Cart extends JFrame {
 		JPanel bookHolder = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		JPanel infoPanel = new JPanel(new BorderLayout());
 		JPanel buttonHolder = new JPanel(new FlowLayout(FlowLayout.CENTER));
+		JPanel plusMinus = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		
 		JLabel imageHolder = new JLabel();
 		JLabel bookInfo = new JLabel();
+		JLabel quantity = new JLabel();
 		
 		JButton remove = new JButton("Remove from Cart");
 		JCheckBox select = new JCheckBox("Select Item");
 		
+		JButton minus = new JButton("-");
+		JButton plus = new JButton("+");
+		
 		ImageIcon bookImage = new ImageIcon(book.picture);
 		
-		this.cartItems.put(book.title, book);
+		if (this.cartItems.containsKey(book)) {
+			int amount = cartItems.get(book);
+			this.cartItems.put(book, amount + 1);
+		}
+		else {
+			this.displayedBooks.put(book, quantity);
+			this.cartItems.put(book, 1);
+		}
+		
 		this.total += book.price;
 		
 		totalPriceLabel.setText("<HTML><P>Total = " + String.format("%.2f", total) + "</P></HTML>");
+		displayedBooks.get(book).setText("<HTML><P>Quantity: " + cartItems.get(book) + "</P><HTML>");
 		
-		imageHolder.setIcon(Controlleur.fixResolution(bookImage, 100, 140));
-		bookInfo.setText("<HTML><P>" + book.title + "</P>"
-						   + "<P>" + book.authName + "</P>"
-						   + "<P>" + book.price + "</P><HTML>");
-		
-		addButtonAction(remove, book, bookHolder);
-		addCheckboxAction(select, book);
-		
-		buttonHolder.add(remove);
-		buttonHolder.add(select);
-				
-		infoPanel.add(bookInfo, BorderLayout.CENTER);
-		infoPanel.add(buttonHolder, BorderLayout.SOUTH);
-		
-		bookHolder.add(imageHolder);
-		bookHolder.add(infoPanel);
-		
-		wrapper.add(bookHolder);
+		if (cartItems.get(book) == 1) {
+			imageHolder.setIcon(Controlleur.fixResolution(bookImage, 100, 140));
+			bookInfo.setText("<HTML><P>" + book.title + "</P>"
+							   + "<P>" + book.authName + "</P>"
+							   + "<P>" + book.price + "</P><HTML>");
+			
+			addRemoveAction(remove, book, bookHolder);
+			addCheckboxAction(select, book);
+			
+			buttonHolder.add(remove);
+			buttonHolder.add(select);
+			
+			plusMinusActions(minus, "minus", book);
+			plusMinusActions(plus, "plus", book);
+			
+			plusMinus.add(minus);
+			plusMinus.add(quantity);
+			plusMinus.add(plus);
+					
+			infoPanel.add(bookInfo, BorderLayout.NORTH);
+			infoPanel.add(plusMinus, BorderLayout.CENTER);
+			infoPanel.add(buttonHolder, BorderLayout.SOUTH);
+			
+			bookHolder.add(imageHolder);
+			bookHolder.add(infoPanel);
+			
+			wrapper.add(bookHolder);
+		}
 		wrapper.revalidate();
 		wrapper.repaint();
 	}
 
-	private void addButtonAction(JButton btn, Livre book, JPanel parent) {
+	private void addRemoveAction(JButton btn, Livre book, JPanel parent) {
 		btn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				wrapper.remove(parent);
-				cartItems.remove(book.title);
-				total -= book.price;
+				total -= book.price * cartItems.get(book);
 				if (selectedItems.containsKey(book.title)) {
-					selected -= book.price;
+					selected -= book.price * cartItems.get(book);
 					selectedItemsLabel.setText("<HTML><P>Selected = " + String.format("%.2f", selected) + "</P></HTML>");
 					selectedItems.remove(book.title);
 				}
 				totalPriceLabel.setText("<HTML><P>Total = " + String.format("%.2f", total) + "</P></HTML>");
+				cartItems.remove(book);
 			}
 		});
 	}
@@ -145,14 +175,54 @@ public class Cart extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (select.isSelected()) {
-					selected += book.price;
+					selected += cartItems.get(book) * book.price;
 					selectedItems.put(book.title, book);
 				}
 				else {
-					selected -= book.price;
+					selected -= cartItems.get(book) * book.price;
 					selectedItems.remove(book.title, book);
 				}
 				selectedItemsLabel.setText("<HTML><P>Selected = " + String.format("%.2f", selected) + "</P></HTML>");
+			}
+		});
+	}
+	
+	private void plusMinusActions(JButton btn, String name, Livre book) {
+		btn.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int amount = cartItems.get(book);
+				int sign;
+				
+				if (amount >= 1) {
+					if (name.equals("minus"))
+						sign = -1;
+					else
+						sign = 1;
+					
+					cartItems.put(book, amount + sign);
+					
+					total += sign * book.price;
+					
+					totalPriceLabel.setText("<HTML><P>Total = " + String.format("%.2f", total) + "</P></HTML>");
+					displayedBooks.get(book).setText("<HTML><P>Quantity: " + cartItems.get(book) + "</P><HTML>");	
+					
+					if (selectedItems.containsKey(book.title)) {
+						selected += sign * book.price;
+						selectedItemsLabel.setText("<HTML><P>Selected = " + String.format("%.2f", selected) + "</P></HTML>");
+					}
+					
+					if (cartItems.get(book) == 0) {
+						cartItems.remove(book);
+						JPanel plusMinus = (JPanel) displayedBooks.get(book).getParent();
+						JPanel infoPanel = (JPanel) plusMinus.getParent();
+						JPanel bookHolder = (JPanel) infoPanel.getParent();
+						displayedBooks.remove(book);
+						selectedItems.remove(book.title, book);
+						wrapper.remove(bookHolder);
+					}
+				}
 			}
 		});
 	}
