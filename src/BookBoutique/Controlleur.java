@@ -12,6 +12,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.ImageIcon;
@@ -38,23 +43,38 @@ import javax.swing.JLabel;
 public class Controlleur extends JFrame implements ActionListener
 {
 	// Class Variables
-	static public ImageIcon logo = new ImageIcon("src\\Images\\books.png");
-	private JPanel innerPanel = new JPanel(new BorderLayout());
+	static public ImageIcon logo;
+	private JPanel innerPanel;
 	public static JButton accueil, catalogue, login, search, FAQ, aboutUs;
-	private Accueil firstPage = new Accueil(true);
-	private Accueil firstPage2 = new Accueil(false);
-	private FAQ faqPage = new FAQ();
-	static public Cart cart = new Cart();
-	static public More more = new More();
-	static public Login lgn = new Login();
+	JTextField searchBar;
+	
+	public HashMap<String, Livre> books;
+	public ArrayList<String> genres;
+	
+	private Accueil firstPage;
+	private FAQ faqPage;
+	static public Cart cart;
+	static public More more;
+	static public Login lgn;
 	
 	public Controlleur()
 	{
+		// Setting class variables
+		Controlleur.logo = new ImageIcon("src\\Images\\books.png");
+		Controlleur.cart = new Cart();
+		Controlleur.more = new More();
+		Controlleur.lgn = new Login();
+		this.books = getBooks("src\\books.csv");
+		this.genres = getGenres(books);
+		this.firstPage = new Accueil(books);
+		this.faqPage = new FAQ();
+		
 		// Setting the JFrame
 		setLayout(new BorderLayout());
 		setIconImage(logo.getImage());
 		setTitle("BookBoutique");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setExtendedState(JFrame.MAXIMIZED_BOTH); 
 		
 		// Adding Components
 		add(header(), BorderLayout.NORTH);
@@ -64,8 +84,7 @@ public class Controlleur extends JFrame implements ActionListener
 		hoverFunctionality();
 		
 		// Setting JFrame some more
-		setVisible(true);	
-		pack();
+		setVisible(true);
 	}
 	
 	/**
@@ -144,6 +163,7 @@ public class Controlleur extends JFrame implements ActionListener
 	private JPanel addInnerPanel()
 	{
 		JPanel buttons = new JPanel(new BorderLayout());
+		innerPanel = new JPanel(new BorderLayout());
 		
 		buttons.add(buttonHolder(), BorderLayout.NORTH);		
 		buttons.add(SearchBar(), BorderLayout.CENTER);
@@ -170,7 +190,7 @@ public class Controlleur extends JFrame implements ActionListener
 	{
 		JPanel searchPanel = new JPanel(new FlowLayout());
 		search = new JButton("Search");
-		JTextField searchBar = new JTextField(80);
+		searchBar = new JTextField(80);
 		
 		search.setBackground(new Color(0X732d21));
 		search.setForeground(Color.white);
@@ -207,11 +227,11 @@ public class Controlleur extends JFrame implements ActionListener
 		JPanel buttonHolder = new JPanel(new GridLayout(1, 5));
 		
 		// Button Icons
-		ImageIcon homeIcon = new ImageIcon("src\\Images\\home.png");
-		ImageIcon catalogueIcon = new ImageIcon("src\\Images\\catalog.png");
-		ImageIcon loginIcon = new ImageIcon("src\\Images\\login.png");
-		ImageIcon faqIcon = new ImageIcon("src\\Images\\faq.png");
-		ImageIcon aboutUsIcon = new ImageIcon("src\\Images\\cart.png");
+		ImageIcon homeIcon = fixResolution(new ImageIcon("src\\Images\\home.png"), 50, 50);
+		ImageIcon catalogueIcon = fixResolution(new ImageIcon("src\\Images\\catalog.png"), 50, 50);
+		ImageIcon loginIcon = fixResolution(new ImageIcon("src\\Images\\login.png"), 70, 70);
+		ImageIcon faqIcon = fixResolution(new ImageIcon("src\\Images\\faq.png"), 50, 50);
+		ImageIcon aboutUsIcon = fixResolution(new ImageIcon("src\\Images\\cart.png"), 50, 50);
 		
 		// Buttons
 		accueil = new JButton();
@@ -221,11 +241,11 @@ public class Controlleur extends JFrame implements ActionListener
 		aboutUs = new JButton();
 		
 		// Adding Buttons
-		buttonHolder.add(buttonHelper(accueil, fixResolution(homeIcon, 50, 50)));
-		buttonHolder.add(buttonHelper(catalogue, fixResolution(catalogueIcon, 50, 50)));
-		buttonHolder.add(buttonHelper(login, fixResolution(loginIcon, 70, 70)));
-		buttonHolder.add(buttonHelper(FAQ, fixResolution(faqIcon, 50, 50)));
-		buttonHolder.add(buttonHelper(aboutUs, fixResolution(aboutUsIcon, 50, 50)));
+		buttonHolder.add(buttonHelper(accueil, homeIcon));
+		buttonHolder.add(buttonHelper(catalogue, catalogueIcon));
+		buttonHolder.add(buttonHelper(login, loginIcon));
+		buttonHolder.add(buttonHelper(FAQ, faqIcon));
+		buttonHolder.add(buttonHelper(aboutUs, aboutUsIcon));
 		
 		return buttonHolder;
 	}
@@ -244,9 +264,8 @@ public class Controlleur extends JFrame implements ActionListener
 	private JPanel buttonHelper(JButton btn, ImageIcon icon)
 	{
 		JPanel btnPanel = new JPanel(new BorderLayout());
-		
+
 		// Setting buttons
-		//btn.setPreferredSize(new Dimension(264, 70));
 		btn.setIcon(icon);
 		btn.setBackground(new Color(0Xc6c2ac));
 		btn.setForeground(Color.white);
@@ -274,14 +293,14 @@ public class Controlleur extends JFrame implements ActionListener
 		try {
 			Component panelToRemove = innerPanel.getComponent(1);
 			innerPanel.remove(panelToRemove);
-			innerPanel.revalidate();
-			innerPanel.repaint();
 		}
 		catch (Exception e) {
 			System.out.print(e.getMessage());
 		}
 		finally {
 			innerPanel.add(newComp, BorderLayout.CENTER);
+			innerPanel.revalidate();
+			innerPanel.repaint();
 		}
 	}
 	
@@ -303,7 +322,13 @@ public class Controlleur extends JFrame implements ActionListener
         	lgn.displayLogin();
         }
         else if (action.getSource() == search) {
-        	
+        	//searchFunctionality();
+        	String input = (searchBar.getText()).toLowerCase();
+        	HashMap<String, Livre> result = searchBooks(books, input, "author");
+        	if (result.isEmpty())
+        		result = searchBooks(books, input, "genre");
+        	Accueil newPage = new Accueil(result);
+        	removeAndAdd(newPage);
         }
         else if (action.getSource() == FAQ) {
         	removeAndAdd(faqPage);
@@ -381,5 +406,77 @@ public class Controlleur extends JFrame implements ActionListener
         
         return scrollPane;
 	}
+	/**
+	 * getBooks:
+	 * 		Populated the books 'HashMap' with the book
+	 * 		data. It does so by reading a CSV file and
+	 * 		inserting the data from the latter into the
+	 * 		HashMap
+	 * @return - the 'HashMap' filled with all the book
+	 * data in the CSV file.
+	 */
+	private HashMap<String, Livre> getBooks(String fileName) {
+        BufferedReader reader = null;
+        String line = "";
+        HashMap<String, Livre> data = new HashMap<String, Livre>();
 
+        try {
+            reader = new BufferedReader(new FileReader(fileName));
+            reader.readLine();
+
+            while ((line = reader.readLine()) != null) {
+                String[] row = line.split(";");
+                Livre currBook = new Livre(row);
+                data.put(currBook.title, currBook);
+            }
+        }
+        catch (Exception e) {
+        	System.out.println("Failed");
+            e.printStackTrace();
+        }
+        finally {
+            try {
+                if (reader != null) {
+                    reader.close();
+                }
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return data;
+	}
+	
+	private ArrayList<String> getGenres(HashMap<String, Livre> books) {
+		ArrayList<String> genres = new ArrayList<String>();
+		
+		for (Livre book : books.values()) {
+			for (String genre : book.genre) {
+				if (!genres.contains(genre)) {
+					genres.add(genre);
+				}
+			}
+		}
+		return genres;
+	}
+	
+	static public HashMap<String, Livre> searchBooks(HashMap<String, Livre> books, String input, String searchTerm) {
+		HashMap<String, Livre> newBooks = new HashMap<String, Livre>();
+		
+		for (Livre book : books.values()) {
+			if (searchTerm.equals("genre")) {
+				for (String bookGenre : book.genre) {
+					if (bookGenre.toLowerCase().contains(input)) {
+						newBooks.put(book.title, book);
+					}
+				}
+			}
+			else if (searchTerm.equals("author")) {
+				if ((book.authName).toLowerCase().contains(input)) {
+					newBooks.put(book.title, book);
+				}
+			}
+		}
+		return newBooks;
+	}
 }

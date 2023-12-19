@@ -2,6 +2,7 @@ package BookBoutique;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -37,19 +38,17 @@ public class Cart extends JFrame
 		
 		this.total = 0.00;
 		this.selected = 0.00;
-		
 		this.cartItems = new HashMap<Livre, Integer>();
 		this.selectedItems = new HashMap<String, Livre>();
 		this.displayedBooks = new HashMap<Livre, JLabel>();
+		wrapper = new JPanel();
+		wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.Y_AXIS));
 		
 		setLayout(new BorderLayout());
 		setIconImage(Controlleur.logo.getImage());
 		setTitle("BookBoutique");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setResizable(false);
-		
-		wrapper = new JPanel();
-		wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.Y_AXIS));
 		
 		addPricePanel();
 		
@@ -128,6 +127,14 @@ public class Cart extends JFrame
 			
 			addRemoveAction(remove, book, bookHolder);
 			addCheckboxAction(select, book);
+			
+			remove.setBackground(new Color(0Xc6c2ac));
+			plus.setBackground(new Color(0Xc6c2ac));
+			minus.setBackground(new Color(0Xc6c2ac));
+			
+			remove.setForeground(Color.WHITE);
+			plus.setForeground(Color.WHITE);
+			minus.setForeground(Color.WHITE);
 			
 			buttonHolder.add(remove);
 			buttonHolder.add(select);
