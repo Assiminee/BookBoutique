@@ -325,7 +325,7 @@ public class Controlleur extends JFrame implements ActionListener
         }
         else if (action.getSource() == search) {
         	//searchFunctionality();
-        	String input = (searchBar.getText()).toLowerCase();
+        	String input = searchBar.getText();
         	HashMap<String, Livre> result = searchBooks(books, input, "author");
         	if (result.isEmpty())
         		result = searchBooks(books, input, "genre");

@@ -39,7 +39,7 @@ public class Catalogue extends JPanel {
 		this.books=books;
 		
 		setLayout(new BorderLayout());
-		add(createJPanels());
+		//add(createJPanels());
 		add(scrollPane());
 		
 		setVisible(true);
@@ -54,7 +54,7 @@ public class Catalogue extends JPanel {
 	{
 		
 		
-		JPanel main_panel = new JPanel();
+		JPanel main_panel = new JPanel(new GridLayout((int)Math.floorDiv(genres.size(), 2) + 1, 2,20,20));
 		
 		for (int i = 0; i < genres.size(); i++) {//récuperé le nombre des elements de la liste des genres.
 		JPanel panel= new JPanel();
@@ -117,7 +117,7 @@ public class Catalogue extends JPanel {
 		
         main_panel.add(panel);
 	}
-		main_panel.setLayout(new GridLayout(4, 2,20,20));
+		
 		return main_panel;
 	}
 	
@@ -131,12 +131,12 @@ public class Catalogue extends JPanel {
 		
 		JScrollPane scrolle = new JScrollPane(createJPanels());
 		
-		scrolle.setPreferredSize(new Dimension(300, 200));
+		scrolle.setPreferredSize(new Dimension(getWidth() - 100, getHeight()));
 		// Activer la barre de défilement verticale
-		scrolle.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		scrolle.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
         // Activer la barre de défilement horizontale
-		scrolle.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+		scrolle.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		scrolle.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		
 		return scrolle;
