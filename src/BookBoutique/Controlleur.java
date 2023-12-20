@@ -44,7 +44,7 @@ public class Controlleur extends JFrame implements ActionListener
 {
 	// Class Variables
 	static public ImageIcon logo;
-	private JPanel innerPanel;
+	public static JPanel innerPanel;
 	public static JButton accueil, catalogue, login, search, FAQ, aboutUs;
 	JTextField searchBar;
 	
@@ -53,6 +53,7 @@ public class Controlleur extends JFrame implements ActionListener
 	
 	private Accueil firstPage;
 	private FAQ faqPage;
+	private Catalogue catal;
 	static public Cart cart;
 	static public More more;
 	static public Login lgn;
@@ -68,6 +69,7 @@ public class Controlleur extends JFrame implements ActionListener
 		this.genres = getGenres(books);
 		this.firstPage = new Accueil(books);
 		this.faqPage = new FAQ();
+		this.catal = new Catalogue(this.genres, this.books);
 		
 		// Setting the JFrame
 		setLayout(new BorderLayout());
@@ -288,7 +290,7 @@ public class Controlleur extends JFrame implements ActionListener
 	 * On the click of a button, the old component is removed
 	 * and another one is placed.
 	 */
-	private void removeAndAdd(Component newComp)
+	public static void removeAndAdd(Component newComp)
 	{
 		try {
 			Component panelToRemove = innerPanel.getComponent(1);
@@ -316,7 +318,7 @@ public class Controlleur extends JFrame implements ActionListener
         	removeAndAdd(firstPage);
         }
         else if (action.getSource() == catalogue) {
-        	
+        	removeAndAdd(catal);
         }
         else if (action.getSource() == login) {
         	lgn.displayLogin();
@@ -466,13 +468,13 @@ public class Controlleur extends JFrame implements ActionListener
 		for (Livre book : books.values()) {
 			if (searchTerm.equals("genre")) {
 				for (String bookGenre : book.genre) {
-					if (bookGenre.toLowerCase().contains(input)) {
+					if (bookGenre.toLowerCase().contains(input.toLowerCase())) {
 						newBooks.put(book.title, book);
 					}
 				}
 			}
 			else if (searchTerm.equals("author")) {
-				if ((book.authName).toLowerCase().contains(input)) {
+				if ((book.authName).toLowerCase().contains(input.toLowerCase())) {
 					newBooks.put(book.title, book);
 				}
 			}
