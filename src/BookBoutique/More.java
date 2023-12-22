@@ -2,18 +2,9 @@ package BookBoutique;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.GridLayout;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -21,11 +12,11 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.border.BevelBorder;
 import javax.swing.JFrame;
 
-public class More extends JFrame implements ActionListener{
+public class More extends JFrame implements ActionListener
+{
 	
 	//private JPanel wrapper = new JPanel();
 	Livre book;
@@ -47,12 +38,15 @@ public class More extends JFrame implements ActionListener{
 	private JPanel createPicPanel() {
 		picPanel = new JPanel();
 		picLabel = new JLabel();
-		addToCart = new JButton("Add to cart");
+		addToCart = new JButton("  Add to cart  ");
 		
 		addToCart.setBackground(new Color(0x732d21));
 	    addToCart.setForeground(Color.WHITE);
 	    addToCart.setFocusable(false);
 	    addToCart.addActionListener(this);
+	    
+	    addToCart.setBorder(BorderFactory.createRaisedBevelBorder());
+	    Controlleur.anotherOnHover(addToCart);
 	    
 	    picLabel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED, Color.BLACK, Color.BLACK));
 		picPanel.setLayout(new BoxLayout(picPanel, BoxLayout.Y_AXIS));

@@ -1,37 +1,16 @@
 package BookBoutique;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.GridLayout;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import javax.swing.BorderFactory;
-import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.border.BevelBorder;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
-
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
 
 public class Login extends JFrame {
 	
@@ -155,7 +134,7 @@ public class Login extends JFrame {
 			        		for (MouseListener ml : Controlleur.login.getMouseListeners()) {
 			        			Controlleur.login.removeMouseListener(ml);
 			        		}
-			        		Controlleur.onHover(Controlleur.login,connectedUser);
+			        		Controlleur.onHover(Controlleur.loginButton,connectedUser);
 			        	}
 					   thisFrame.dispose();
 				   }

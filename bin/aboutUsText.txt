@@ -6,7 +6,7 @@
   <style>
     body {
       font-family: Georgia;
-      margin-left: 30px;
+      text-align: center; /* Center-align the text */
 	  background-color: eeeeee;
     }
     h1 {
@@ -51,6 +51,6 @@
       <p>Postal Code: 12345</p>
     </div>
   </div>
-  <h1>Frequently Asked Questions (FAQs)</h1>
+  <h1>Leave us a Comment</h1>
 </body>
 </html>
