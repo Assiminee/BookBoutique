@@ -399,7 +399,7 @@ public class Controlleur extends JFrame implements ActionListener
 		onHover(accueilButton, "Home");
 		onHover(catalogButton, "Catalog");
 		onHover(loginButton, "Login");
-		onHover(aboutUsButton, "FAQ");
+		onHover(aboutUsButton, "About Us");
 		onHover(cartButton, "Cart");
 	}
 	

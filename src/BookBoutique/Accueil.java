@@ -233,7 +233,8 @@ public class Accueil extends JPanel
 	
 	private JPanel browsingButtons() {
 		JPanel buttons = new JPanel();
-		int numPages = (int)Math.floorDiv(books.size(), 12) + 1;
+		int maxPages = (int)Math.floorDiv(books.size(), 12) + 1;
+		int numPages = (books.size() % 12 == 0) ? maxPages - 1 : maxPages;
 		
 		buttons.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 0));
 		for (int j = 0; j < numPages; j++) {

@@ -2,6 +2,7 @@ package BookBoutique;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -131,6 +132,7 @@ public class Cart extends JFrame implements ActionListener
 		displayedBooks.get(book).setText(" Quantity: " + cartItems.get(book) + " ");
 				
 		if (cartItems.get(book) == 1) {
+			bookInfo.setPreferredSize(new Dimension(100, 80));
 			bookInfo.setText("<HTML><P>" + book.title + "</P>"
 							   + "<P>" + book.authName + "</P>"
 							   + "<P>" + book.price + "</P><HTML>");
