@@ -50,17 +50,18 @@ public class Controlleur extends JFrame implements ActionListener
 	// Class Variables
 	static public ImageIcon logo;
 	public static JPanel innerPanel;
-	public static JButton accueilButton, catalogButton, loginButton, search, aboutUsButton, cartButton;
-	JTextField searchBar;
+	public static JButton accueilButton, catalogButton, loginButton, search, aboutUsButton, cartButton/*, inboxButton*/;
+	private JTextField searchBar;
 	public HashMap<String, Livre> books;
 	public ArrayList<String> genres;
+	static public User connectedUser = null;
 	
 	private Accueil accueil;
-	private AboutUs aboutUs;
+	static public AboutUs aboutUs;
 	private Catalogue catalog;
+	static public Login login = null;
 	static public Cart cart;
 	static public More more;
-	static public Login login;
 	
 	public Controlleur()
 	{
@@ -68,12 +69,12 @@ public class Controlleur extends JFrame implements ActionListener
 		Controlleur.logo = new ImageIcon("src\\Images\\books.png");
 		Controlleur.cart = new Cart();
 		Controlleur.more = new More();
-		Controlleur.login = new Login();
 		this.books = getBooks("src\\books.csv");
 		this.genres = getGenres(books);
 		this.accueil = new Accueil(books, "");
-
 		this.catalog = new Catalogue(this.genres, this.books);
+		
+		
 	
 		// Setting the JFrame
 		setLayout(new BorderLayout());
@@ -91,7 +92,7 @@ public class Controlleur extends JFrame implements ActionListener
 		
 		// Setting JFrame some more
 		setVisible(true);
-		this.aboutUs = new AboutUs();
+		Controlleur.aboutUs = new AboutUs();
 	}
 	
 	/**
@@ -240,6 +241,7 @@ public class Controlleur extends JFrame implements ActionListener
 		ImageIcon catalogIcon = fixResolution(new ImageIcon("src\\Images\\catalog.png"), 50, 50);
 		ImageIcon loginIcon = fixResolution(new ImageIcon("src\\Images\\login.png"), 70, 70);
 		ImageIcon aboutUsIcon = fixResolution(new ImageIcon("src\\Images\\aboutUs.png"), 60, 60);
+		//ImageIcon inboxIcon = fixResolution(new ImageIcon("src\\Images\\mail.png"), 60, 60);
 		ImageIcon cartIcon = fixResolution(new ImageIcon("src\\Images\\cart.png"), 50, 50);
 		
 		// Buttons
@@ -247,6 +249,7 @@ public class Controlleur extends JFrame implements ActionListener
 		catalogButton = new JButton();
 		loginButton = new JButton();
 		aboutUsButton = new JButton();
+		//inboxButton = new JButton();
 		cartButton = new JButton();
 		
 		// Adding Buttons
@@ -254,6 +257,7 @@ public class Controlleur extends JFrame implements ActionListener
 		buttonHolder.add(buttonHelper(catalogButton, catalogIcon));
 		buttonHolder.add(buttonHelper(loginButton, loginIcon));
 		buttonHolder.add(buttonHelper(aboutUsButton, aboutUsIcon));
+		//buttonHolder.add(buttonHelper(inboxButton, inboxIcon));
 		buttonHolder.add(buttonHelper(cartButton, cartIcon));
 		
 		return buttonHolder;
@@ -328,19 +332,18 @@ public class Controlleur extends JFrame implements ActionListener
         	removeAndAdd(catalog);
         }
         else if (action.getSource() == loginButton) {
-        	login.displayLogin();
+        	loginAction();
         }
         else if (action.getSource() == search) {
-        	//searchFunctionality();
         	String searchTerm = searchBar.getText();
-        	HashMap<String, Livre> result = search(books, searchTerm);
+        	HashMap<String, Livre> result = search(searchTerm);
         	Accueil newPage = new Accueil(result, "");
         	removeAndAdd(newPage);
         }
         else if (action.getSource() == aboutUsButton) {
         	removeAndAdd(aboutUs);
         }
-        else if (action.getSource() == cartButton) {
+        else if (action.getSource() == cartButton) { 
         	cart.displayCart();
         }
     }
@@ -400,6 +403,7 @@ public class Controlleur extends JFrame implements ActionListener
 		onHover(catalogButton, "Catalog");
 		onHover(loginButton, "Login");
 		onHover(aboutUsButton, "About Us");
+		//onHover(inboxButton, "Inbox");
 		onHover(cartButton, "Cart");
 	}
 	
@@ -426,9 +430,10 @@ public class Controlleur extends JFrame implements ActionListener
         scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         return scrollPane;
 	}
+	
 	/**
 	 * getBooks:
-	 * 		Populated the books 'HashMap' with the book
+	 * 		Populates the books 'HashMap' with the book
 	 * 		data. It does so by reading a CSV file and
 	 * 		inserting the data from the latter into the
 	 * 		HashMap
@@ -467,6 +472,14 @@ public class Controlleur extends JFrame implements ActionListener
         return data;
 	}
 	
+	/**
+	 * getGenres:
+	 * 			creates a list of all the books genres
+	 * 			available
+	 * @param books - a "HashMap" of of books
+	 * @return - An "ArrayList" with all the genres
+	 * extracted from the books "HashMap"
+	 */
 	private ArrayList<String> getGenres(HashMap<String, Livre> books) {
 		ArrayList<String> genres = new ArrayList<String>();
 		
@@ -480,10 +493,20 @@ public class Controlleur extends JFrame implements ActionListener
 		return genres;
 	}
 	
-	private HashMap<String, Livre> search(HashMap<String, Livre> books, String searchTerm) {
+	/**
+	 * search:
+	 * 		Searches the books "HashMap" for books
+	 * 		that match (genre, title, or author name)
+	 * 		a specific search term passed to it.
+	 * @param searchTerm - the word to search for
+	 * @return a "HashMap" containing the books that
+	 * match the search term.
+	 */
+	private HashMap<String, Livre> search(String searchTerm) {
 		HashMap<String, Livre> newBooks = new HashMap<String, Livre>();
 		boolean added;
 		
+		searchTerm = searchTerm.trim();
 		for (Livre book : books.values()) {
 			added = false;
 			for (String bookGenre : book.genre) {
@@ -504,6 +527,14 @@ public class Controlleur extends JFrame implements ActionListener
 		return newBooks;
 	}
 	
+	/**
+	 * genreBasedSearch:
+	 * 		searches the database for books that
+	 * 		belong to a specific genre
+	 * @param books - the "HashMap" containing the books to search
+	 * @param input - the specific "genre" to search for 
+	 * @return - a "HashMap" with the books from a specific genre
+	 */
 	static public HashMap<String, Livre> genreBasedSearch(HashMap<String, Livre> books, String input) {
 		HashMap<String, Livre> newBooks = new HashMap<String, Livre>();
 		
@@ -516,5 +547,22 @@ public class Controlleur extends JFrame implements ActionListener
 			}
 		}
 		return newBooks;
+	}
+	
+	static public void loginAction() {
+		if (login == null) {
+    		login = new Login();
+    	}
+    	if (!login.connected) {
+    		login.appear();
+    	}
+    	else {
+    		cart.storeCart();
+    		cart.emptyCart();
+    		onHover(loginButton, "Login");
+    		aboutUs.emptyTextFields();
+    		login = null;
+    		connectedUser = null;
+    	}
 	}
 }

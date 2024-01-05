@@ -79,14 +79,21 @@ public class More extends JFrame implements ActionListener
 				   
 		revalidate();
 		repaint();
+		toFront();
 		setVisible(true);
 		pack();
+		setLocationRelativeTo(null);
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == addToCart) {
-        	Controlleur.cart.addToCart(book);
+			if (Controlleur.connectedUser == null) {
+				Controlleur.loginAction();
+			}
+			else {
+				Controlleur.cart.addToCart(book);
+			}
         }
 	}
 }

@@ -15,6 +15,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 /**
  * Accueil : class
@@ -33,22 +34,38 @@ public class Accueil extends JPanel
 	
 	public Accueil(HashMap<String, Livre> books, String name)
 	{	
-		JPanel test = new JPanel(new BorderLayout());
+		JPanel titleAndButtons = new JPanel(new BorderLayout());
+		JScrollPane scroll;
 		this.books = books;
 		this.bookKeys = books.keySet().toArray(new String[0]);
 		setLayout(new BorderLayout());
+		
 		createJPanels();
 		
 		if (!name.equals("")) {
-			test.add(createGenreTitle(name), BorderLayout.NORTH);
+			titleAndButtons.add(createGenreTitle(name), BorderLayout.NORTH);
 		}
-		test.add(browsingButtons(), BorderLayout.CENTER);
-		add(test, BorderLayout.NORTH);
 		
-		add(Controlleur.scrollPane(wrapper, getWidth(), getHeight()), BorderLayout.CENTER);
+		titleAndButtons.add(browsingButtons(), BorderLayout.CENTER);
+		add(titleAndButtons, BorderLayout.NORTH);
+		
+		scroll = Controlleur.scrollPane(wrapper, getWidth(), getHeight());
+		if (books.size() < 5) {
+			scroll.getVerticalScrollBar().setEnabled(false);
+		}
+		
+		add(scroll, BorderLayout.CENTER);
 		setVisible(true);
 	}
 	
+	/**
+	 * createGenreTitle:
+	 * 		Creates a title for the page containing the
+	 * 		title of the genre selected
+	 * @param name - the title of the genre
+	 * @return - a "JPanel" holding a "JLabel" with
+	 * the title 
+	 */
 	public JPanel createGenreTitle(String name) {
 		JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		JLabel label = new JLabel("  You are now browsing the \"" + name + "\" category  ");
@@ -64,21 +81,21 @@ public class Accueil extends JPanel
 	
 	/**
 	 * createJPanels:
-	 * 		Accueil is a 'JPanel' that holds the 'JPanel'
-	 * 		wrapper.
-	 * @wrapper - wrapper wraps around all the central
-	 * 		components. The method createJPanels() creates
-	 * 		individual 'JPanels' that are placed in wrapper.
+	 * 		Adds "JPanels" to the center of the "JPanel"
+	 * 		wrapper. These "JPanels" contain the data from
+	 * 		a book (Image, Title, Author, Price) and two
+	 * 		buttons (Add to Cart, More).
+	 * @wrapper - the central "JPanel" to which the individual
+	 * 		"JPanels" displaying the books are added.
 	 * @books - a 'HashMap' that contains all the book data
 	 * 		to be displayed in the 'JPanels' within wrapper.
-	 * @return 'JPanel' returns wrapper after its been
-	 * populated with the 'JPanels' holding the content. 
 	 */
 	private void createJPanels()
 	{
 		int i = 0;
-		int numRows = books.size() > 12 ? 3 : 2;
-		//numRows = (books.size() % 4 == 0) ? numRows : (numRows + 1);
+		int numRows = books.size() >= 12 ? 3 : (int) (books.size()/4);
+		numRows = (books.size() % 4 == 0) ? numRows : (numRows + 1);
+		numRows = 3;
 		wrapper = new JPanel();
 		wrapper.setLayout(new GridLayout(numRows, 4, 15, 15));
 		
@@ -172,7 +189,12 @@ public class Accueil extends JPanel
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (name.equals("  Add to cart  ")) {
-					Controlleur.cart.addToCart(book);
+					if (Controlleur.connectedUser == null) {
+						Controlleur.loginAction();
+					}
+					else {
+						Controlleur.cart.addToCart(book);
+					}
 				}
 				else {
 					Controlleur.more.openMore(book);
@@ -191,7 +213,7 @@ public class Accueil extends JPanel
 	 */
 	private void setContentHolder(JLabel cHolder, Livre book)
 	{
-		cHolder.setText("<html><p>" + book.title + "</p><br><p>Price: " + book.price * 10 + " MAD</p></html>");
+		cHolder.setText("<html><p>" + book.title + "</p><br><p>Price: $" + book.price + "</p></html>");
 		cHolder.setVerticalTextPosition(JLabel.BOTTOM);
 		cHolder.setHorizontalTextPosition(JLabel.CENTER);
 		cHolder.setHorizontalAlignment(JLabel.CENTER);

@@ -10,6 +10,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
@@ -29,6 +32,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.DefaultStyledDocument;
+import javax.swing.text.DocumentFilter;
 /**
  * FAQ - class
  * Displays information about BookBoutique and has
@@ -39,6 +45,7 @@ public class AboutUs extends JPanel
 	private JPanel wrapper = new JPanel(new BorderLayout());
 	private JTextArea textArea;
 	private JButton send;
+	private JTextField email, username;
 	
 	public AboutUs ()
 	{
@@ -119,11 +126,12 @@ public class AboutUs extends JPanel
 		JLabel usernameLabel = new JLabel("Username: ");
 		JLabel cqLabel = new JLabel("Comment/Question: ");
 		
-		JTextField email = new JTextField(10);
-		JTextField username = new JTextField(10);
+		email = new JTextField(10);
+		username = new JTextField(10);
 		textArea = new JTextArea(13, 30);
 		send = new JButton("Send");
 				
+		
 		emailHolder.add(emailLabel, BorderLayout.NORTH);
 		emailHolder.add(email, BorderLayout.CENTER);
 		
@@ -152,10 +160,27 @@ public class AboutUs extends JPanel
 		return wrapper;
 	}
 	
+	public void setTextFields(User connectedUser) {
+		email.setText(connectedUser.email);
+		username.setText(connectedUser.userName);
+	}
+	
 	private void setTextArea() {
 		textArea.setLineWrap(true);
 		textArea.setWrapStyleWord(true);
 		textArea.setBorder(BorderFactory.createEtchedBorder());
+		textArea.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyTyped(KeyEvent e) {
+				int max = 500;
+				String text = textArea.getText();
+				e.consume();
+				if (text.length() >= max) {
+					String shortened = text.substring(0, max - 1);
+					textArea.setText(shortened);
+				}
+			}
+		});
 	}
 	
 	private void setSendButton(JTextField email, JTextField username) {
@@ -192,7 +217,6 @@ public class AboutUs extends JPanel
 	            @Override
 	            public void run() {
 	            	textField.setBackground(Color.WHITE);
-	            	
 	            }
 	        }, 2000);
 		}
@@ -272,5 +296,10 @@ public class AboutUs extends JPanel
 		        btn.setBackground(new Color(0X798751));
 		    }
 		});
+	}
+	
+	public void emptyTextFields() {
+		email.setText("");
+		username.setText("");
 	}
 }

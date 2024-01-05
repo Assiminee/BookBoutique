@@ -6,6 +6,18 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.lang.reflect.Array;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -49,9 +61,111 @@ public class Cart extends JFrame implements ActionListener
 		add(Controlleur.scrollPane(wrapper, 350, 500), BorderLayout.CENTER);
 	}
 	
+	//private HashMap<Livre, Integer> cartItems;
+	//private HashMap<Livre, JLabel> displayedBooks;
+	
+	public void storeCart() {
+		String filePath = "src/carts/" + Controlleur.connectedUser.userName + ".txt";
+		Path file = Paths.get(filePath);
+		String entry = "";
+		
+		
+		if (Files.exists(file)) {
+			try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+				writer.write("");
+				System.out.println("File has been cleared");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true))) {
+			for (Livre book : cartItems.keySet()) {
+				String[] genres = book.genre;
+				String bookGenres = "[";
+				for (String genre : genres) {
+					bookGenres += (genre + "/");
+				}
+				bookGenres = bookGenres.substring(0, bookGenres.length() - 1);
+				bookGenres += "]";
+				entry = book.title + ";"
+						+ book.picture + ";"
+						+ book.authName + ";"
+						+ book.synopsis + ";"
+						+ bookGenres + ";"
+						+ book.price + ";"
+						+ cartItems.get(book);
+				writer.write(entry);
+				writer.newLine();
+			}
+			System.out.println("File has been updated");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void loadCart() {
+		String filePath = "src/carts/" + Controlleur.connectedUser.userName + ".txt";
+		Path file = Paths.get(filePath);
+        BufferedReader reader = null;
+        String line = "";
+
+
+        if (Files.exists(file)) {
+	        try {
+	            reader = new BufferedReader(new FileReader(filePath));
+	            
+	            while ((line = reader.readLine()) != null) {
+
+	                String[] row = line.split(";");
+	                String[] newArray = new String[row.length - 1];
+	                String genreStr = row[4];
+	                genreStr = genreStr.substring(1, genreStr.length() - 1);
+	                int quantity = Integer.parseInt(row[row.length - 1]);
+	                for (int i = 0; i < row.length - 1; i++) {
+	                	if (i == 4) {
+	                		newArray[i] = genreStr;
+	                		continue;
+	                	}
+	                	newArray[i] = row[i];
+	                }
+	                Livre book = new Livre(newArray);
+	                for (int i = 0; i < quantity; i++) {
+		                addToCart(book);
+	                }
+	            }
+	        }
+	        catch (Exception e) {
+	        	System.out.println("Failed to load file");
+	            e.printStackTrace();
+	        }
+	        finally {
+	            try {
+	                if (reader != null) {
+	                    reader.close();
+	                }
+	            }
+	            catch (IOException e) {
+	                e.printStackTrace();
+	            }
+	        }
+		}
+	}
+	
+	public void emptyCart() {
+		this.total = 0.00;
+    	totalPriceLabel.setText("    Total = " + String.format("%.2f", total) + "    ");
+    	wrapper.removeAll();
+    	revalidate();
+		repaint();
+		cartItems.clear();
+    	displayedBooks.clear();
+	}
+	
 	public void displayCart() {
+		toFront();
 		setVisible(true);
 		pack();
+		setLocationRelativeTo(null);
 	}
 	
 	private void addPricePanel() {
@@ -85,17 +199,42 @@ public class Cart extends JFrame implements ActionListener
 		add(container, BorderLayout.NORTH);
 	}
 	
+	public static ArrayList<User> getUsers() {
+		String fileName = "src/usersLogins/users.txt";
+        BufferedReader reader = null;
+        String line = "";
+		ArrayList<User> users = new ArrayList<User>();
+
+        try {
+            reader = new BufferedReader(new FileReader(fileName));
+
+            while ((line = reader.readLine()) != null) {
+                String[] row = line.split("²");
+                User currUser = new User(row);
+                users.add(currUser);
+            }
+        }
+        catch (Exception e) {
+        	System.out.println("Failed to load user");
+            e.printStackTrace();
+        }
+        finally {
+            try {
+                if (reader != null) {
+                    reader.close();
+                }
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+		return users;
+	}
 	@Override
     public void actionPerformed(ActionEvent action)
 	{
 		if (action.getSource() == purchaseAll || action.getSource() == freeCart) {
-        	this.total = 0.00;
-        	totalPriceLabel.setText("    Total = " + String.format("%.2f", total) + "    ");
-        	wrapper.removeAll();
-        	revalidate();
-    		repaint();
-    		cartItems.clear();
-        	displayedBooks.clear();
+			emptyCart();
         }
     }
 	/**

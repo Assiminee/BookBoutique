@@ -1,0 +1,8 @@
+The Stand;src\\bookCovers\\TheStand.png;Stephen King;A post-apocalyptic horror novel depicting a battle between good and evil;[Horror/Post-Apocalyptic];13.75;5
+The Hitchhiker's Guide to the Galaxy;src\\bookCovers\\TheHitchhikersGuidetotheGalaxy.jpeg;Douglas Adams;A comedic science fiction series following the adventures of Arthur Dent;[Science Fiction/Comedy];11.99;1
+Thinking, Fast and Slow;src\\bookCovers\\ThinkingFastandSlow.png;Daniel Kahneman;A book that delves into the two systems that drive how people think;[Non-fiction/Psychology];15.25;1
+1984;src\\bookCovers\\1984.jpg;George Orwell;A dystopian novel set in a totalitarian society;[Fiction];10.99;1
+The Hunger Games;src\\bookCovers\\TheHungerGames.jpg;Suzanne Collins;A dystopian novel about a girl fighting in a televised battle for survival;[Science Fiction/Dystopian];11.49;1
+The Road;src\\bookCovers\\TheRoad.jpg;Cormac McCarthy;A post-apocalyptic novel exploring survival and human nature;[Fiction/Dystopian];14.99;2
+War and Peace;src\\bookCovers\\WarAndPeace.jpeg;Leo Tolstoy;An epic novel depicting Russian society during the Napoleonic era;[Classics/Historical Fiction];15.49;1
+The Fault in Our Stars;src\\bookCovers\\The_Fault_in_Our_Stars.jpg;John Green;A love story between two teenagers who meet at a cancer support group;[Young Adult/Romance];9.75;1
