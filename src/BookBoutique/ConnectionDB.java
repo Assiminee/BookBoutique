@@ -73,12 +73,11 @@ public class ConnectionDB {
 				Livre book = new Livre(bookData);
 				books.put(book.title, book);
 			}
-			return books;
 		}
 		catch (SQLException e) {
 			e.printStackTrace();
-			return null;
 		}
+		return books;
 	}
 	
 	private void establishConnection() {
@@ -93,5 +92,25 @@ public class ConnectionDB {
 			e.printStackTrace();
 		}
 	}
+
 	
+	public HashMap<String, Livre> search(String searchTerm) {
+		HashMap<String, Livre> searchedBooks = new HashMap<String, Livre>();
+		String genreBasedSearchQuery = "SELECT DISTINCT b.* FROM books b\r\n"
+										+ "INNER JOIN belongto bt ON b.ID = bt.bookID\r\n"
+										+ "INNER JOIN genres g ON g.ID = bt.genreID\r\n"
+										+ "WHERE g.title LIKE \"%" + searchTerm + "%\";";
+		
+		String authorBasedSearchQuery = "SELECT * FROM books\r\n"
+										+ "WHERE authName LIKE \"%" + searchTerm + "%\";";
+		
+		String titleBasedSearchQuery = "SELECT * FROM books\r\n"
+										+ "WHERE title LIKE \"%" + searchTerm + "%\";";
+		
+		
+		searchedBooks.putAll(getBooksFromDB(genreBasedSearchQuery));
+		searchedBooks.putAll(getBooksFromDB(authorBasedSearchQuery));
+		searchedBooks.putAll(getBooksFromDB(titleBasedSearchQuery));
+		return searchedBooks;
+	}
 }
