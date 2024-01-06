@@ -7,6 +7,9 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.JLabel;
@@ -15,12 +18,10 @@ import javax.swing.JPanel;
 public class Catalogue extends JPanel {
 	
 	ArrayList<String> genres ;
-	HashMap<String, Livre> books;
 	
-	public Catalogue(ArrayList<String> genres,HashMap<String, Livre> books) {
+	public Catalogue() {
 		
-		this.genres = genres;
-		this.books = books;
+		this.genres = Controlleur.connection.getAllGenres();
 		
 		setLayout(new BorderLayout());
 		add(Controlleur.scrollPane(createJPanels(), getWidth(), getHeight()), BorderLayout.CENTER);
@@ -48,7 +49,12 @@ public class Catalogue extends JPanel {
 	        panel.addMouseListener(new MouseListener() {
 				@Override
 	            public void mouseClicked(MouseEvent e) {
-	            	HashMap<String,Livre> selectedBooks = Controlleur.genreBasedSearch(books, name);
+					String query = "SELECT DISTINCT b.*\r\n"
+									+ "FROM books b\r\n"
+			            			+ "INNER JOIN belongto bt ON b.ID = bt.bookID\r\n"
+			            			+ "INNER JOIN genres g ON g.ID = bt.genreID\r\n"
+			            			+ "WHERE g.title LIKE \"" + name + "\";";
+	            	HashMap<String,Livre> selectedBooks = Controlleur.connection.getBooksFromDB(query);
 	        		Accueil newPage = new Accueil(selectedBooks, name);
 	        		Controlleur.removeAndAdd(newPage);
 	            }

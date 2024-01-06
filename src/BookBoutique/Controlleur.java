@@ -8,18 +8,14 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Image;
-import java.awt.Insets;
-import java.awt.Point;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.BorderFactory;
@@ -31,6 +27,13 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
+
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 /**
  * Controlleur - class
@@ -62,17 +65,19 @@ public class Controlleur extends JFrame implements ActionListener
 	static public Login login = null;
 	static public Cart cart;
 	static public More more;
+	static public ConnectionDB connection;
 	
 	public Controlleur()
-	{
+	{		
 		// Setting class variables
 		Controlleur.logo = new ImageIcon("src\\Images\\books.png");
 		Controlleur.cart = new Cart();
 		Controlleur.more = new More();
+		Controlleur.connection = new ConnectionDB();
 		this.books = getBooks("src\\books.csv");
 		this.genres = getGenres(books);
-		this.accueil = new Accueil(books, "");
-		this.catalog = new Catalogue(this.genres, this.books);
+		this.accueil = new Accueil(Controlleur.connection.getBooksFromDB("Select * FROM books LIMIT 36"), "");
+		this.catalog = new Catalogue();
 		
 		
 	
@@ -472,6 +477,9 @@ public class Controlleur extends JFrame implements ActionListener
         return data;
 	}
 	
+	// Database methods
+	
+	// Database methods
 	/**
 	 * getGenres:
 	 * 			creates a list of all the books genres
