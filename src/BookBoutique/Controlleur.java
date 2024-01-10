@@ -1,5 +1,6 @@
 package BookBoutique;
 
+import Administrator.Admin;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -22,6 +23,9 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+
+import Administrator.Admin;
+
 import javax.swing.JLabel;
 
 /**
@@ -47,12 +51,14 @@ public class Controlleur extends JFrame implements ActionListener
 	static public User connectedUser = null;
 	
 	private Accueil accueil;
+	private Admin admin;
 	static public AboutUs aboutUs;
 	private Catalogue catalog;
 	static public Login login = null;
 	static public Cart cart;
 	static public More more;
 	static public ConnectionDB connection;
+	
 	
 	public Controlleur()
 	{		
@@ -63,9 +69,8 @@ public class Controlleur extends JFrame implements ActionListener
 		Controlleur.connection = new ConnectionDB();
 		this.accueil = new Accueil(Controlleur.connection.getBooksFromDB("Select * FROM books LIMIT 36"), "");
 		this.catalog = new Catalogue();
+		this.admin = new Admin();
 		
-		
-	
 		// Setting the JFrame
 		setLayout(new BorderLayout());
 		setIconImage(logo.getImage());
