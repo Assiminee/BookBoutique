@@ -30,8 +30,8 @@ public class RoundedPanel extends JPanel
             setLayout(null);
             setBorder(new EmptyBorder(0, 10, 10, 10));
             setBackground(Color.white);
-            fieldTitle.setBounds(160, 50, 50, 20);
-            elementCount.setBounds(160, 70, 20, 20);
+            fieldTitle.setBounds(160, 50, 100, 20);
+            elementCount.setBounds(160, 70, 100, 20);
             add(fieldTitle);
             add(elementCount);
             setPreferredSize(new Dimension(300, 250));
