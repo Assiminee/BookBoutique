@@ -397,7 +397,6 @@ public class Controlleur extends JFrame implements ActionListener
 		onHover(catalogButton, "Catalog");
 		onHover(loginButton, "Login");
 		onHover(aboutUsButton, "About Us");
-		//onHover(inboxButton, "Inbox");
 		onHover(cartButton, "Cart");
 	}
 	
