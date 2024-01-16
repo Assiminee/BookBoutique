@@ -49,12 +49,7 @@ public class Catalogue extends JPanel {
 	        panel.addMouseListener(new MouseListener() {
 				@Override
 	            public void mouseClicked(MouseEvent e) {
-					String query = "SELECT DISTINCT b.*\r\n"
-									+ "FROM books b\r\n"
-			            			+ "INNER JOIN belongto bt ON b.ID = bt.bookID\r\n"
-			            			+ "INNER JOIN genres g ON g.ID = bt.genreID\r\n"
-			            			+ "WHERE g.title LIKE \"" + name + "\";";
-	            	HashMap<String,Livre> selectedBooks = Controlleur.connection.getBooksFromDB(query);
+	            	HashMap<String,Livre> selectedBooks = Controlleur.connection.genreBasedSearch(name);
 	        		Accueil newPage = new Accueil(selectedBooks, name);
 	        		Controlleur.removeAndAdd(newPage);
 	            }

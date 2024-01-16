@@ -16,32 +16,43 @@ import javax.swing.border.EmptyBorder;
 
 public class RoundedPanel extends JPanel
 {
-
-	private int cornerRadius = 30;
-    private BufferedImage image;
-    public RoundedPanel(String imagePath, String label, int count) {
+	private int width, height;
+	private int cornerRadius = 50;
+    public BufferedImage image;
+    public String imagePath;
+    public int[] imageSpecs;
+    public RoundedPanel(String imagePath, int width, int height, int[] imageSpecs) {
         super();
         try {
+        	this.imagePath = imagePath;
             image = ImageIO.read(new File(imagePath));
-            JLabel fieldTitle = new JLabel(label);
-            JLabel elementCount = new JLabel(Integer.toString(count));
-            fieldTitle.setFont(new Font("Cambria", Font.TYPE1_FONT, 20));
-            elementCount.setFont(new Font("Cambria", Font.TYPE1_FONT, 10));
-            setLayout(null);
+        }
+        catch (IOException e) {
+        	if (!imagePath.isEmpty())
+        		System.out.println("Image doesn't exist");
+        }
+        finally
+        {
+        	this.imageSpecs = imageSpecs;
+        	this.width = width;
+        	this.height = height;
             setBorder(new EmptyBorder(0, 10, 10, 10));
             setBackground(Color.white);
-            fieldTitle.setBounds(160, 50, 100, 20);
-            elementCount.setBounds(160, 70, 100, 20);
-            add(fieldTitle);
-            add(elementCount);
-            setPreferredSize(new Dimension(300, 250));
-        } catch (IOException e) {
-            e.printStackTrace();
+            setPreferredSize(new Dimension(width, height));
         }
 
         setOpaque(false);
     }
-
+    
+    public void insertLabel(String text, int x, int y, int width, int height, int weight) {
+    	setLayout(null);
+    	JLabel label = new JLabel(text);
+        
+    	label.setFont(new Font("Cambria", Font.TYPE1_FONT, weight));
+    	label.setBounds(x, y, width, height);
+        add(label);
+    }
+    
     public void setCornerRadius(int cornerRadius) {
         this.cornerRadius = cornerRadius;
         repaint();
@@ -53,16 +64,13 @@ public class RoundedPanel extends JPanel
 
         Graphics2D graphics2D = (Graphics2D) g.create();
 
-        int width = 300;
-        int height = 150;
-
         graphics2D.setColor(getBackground());
         graphics2D.fillRoundRect(0, 0, width, height, cornerRadius, cornerRadius);
         if (image != null) {
             Graphics2D g2d = (Graphics2D) g.create();
             g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
             g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-            g2d.drawImage(image, 20, 25, 100, 100, null); // Drawing the image to fit the panel size
+            g2d.drawImage(image, imageSpecs[0], imageSpecs[1], imageSpecs[2], imageSpecs[3], null); // Drawing the image to fit the panel size
         }
         graphics2D.dispose();
     }

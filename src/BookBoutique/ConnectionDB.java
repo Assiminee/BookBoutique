@@ -80,6 +80,65 @@ public class ConnectionDB {
 		return books;
 	}
 	
+	public ArrayList<String> getSingleBook(String query) {
+		ArrayList<String> book = new ArrayList<String>();
+		
+		try {
+			Statement stm = con.createStatement();
+			ResultSet rs = stm.executeQuery(query);
+			while (rs.next()) {
+				book.add(rs.getString(2));
+				book.add(rs.getString(4));
+				book.add(Double.toString(rs.getDouble(6)));
+				book.add(Integer.toString(rs.getInt(7)));
+				book.add(rs.getString(5));
+				book.add(rs.getString(3));
+			}
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return book;
+	}
+	
+	public ArrayList<String> getNGenres(String tableName, int start, int count) {
+		ResultSet res;
+		Statement stm;
+		ArrayList<String> entries = new ArrayList<String>();
+		
+		try 
+		{
+			stm = con.createStatement();
+			res = stm.executeQuery("SELECT * FROM " + tableName + " LIMIT " + start + ", " + count);
+			while (res.next()) {
+				entries.add(res.getString(2));
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		return entries;
+	}
+	
+	public static int getCount(String tableName) {
+		String query = "SELECT COUNT(*) FROM " + tableName;
+		ResultSet res;
+		Statement stm;
+		
+		try 
+		{
+			stm = con.createStatement();
+			res = stm.executeQuery(query);
+			while (res.next()) {
+				return res.getInt(1);
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
+	
 	private void establishConnection() {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
@@ -94,12 +153,35 @@ public class ConnectionDB {
 	}
 
 	
-	public HashMap<String, Livre> search(String searchTerm) {
-		HashMap<String, Livre> searchedBooks = new HashMap<String, Livre>();
+	public HashMap<String, Livre> genreBasedSearch(String searchTerm) {
 		String genreBasedSearchQuery = "SELECT DISTINCT b.* FROM books b\r\n"
 										+ "INNER JOIN belongto bt ON b.ID = bt.bookID\r\n"
 										+ "INNER JOIN genres g ON g.ID = bt.genreID\r\n"
 										+ "WHERE g.title LIKE \"%" + searchTerm + "%\";";
+
+		return getBooksFromDB(genreBasedSearchQuery);
+	}
+	
+	public int getBookCount(String searchTerm) {
+		String query = "(SELECT DISTINCT b.* FROM books b\r\n"
+						+ "INNER JOIN belongto bt ON b.ID = bt.bookID\r\n"
+						+ "INNER JOIN genres g ON g.ID = bt.genreID\r\n"
+						+ "WHERE g.title LIKE \"%" + searchTerm + "%\") AS test;";
+		
+		return getCount(query);
+	}
+	
+	public HashMap<String, Livre> test(String searchTerm, int start) {
+		String genreBasedSearchQuery = "SELECT DISTINCT b.* FROM books b\r\n"
+										+ "INNER JOIN belongto bt ON b.ID = bt.bookID\r\n"
+										+ "INNER JOIN genres g ON g.ID = bt.genreID\r\n"
+										+ "WHERE g.title LIKE \"%" + searchTerm + "%\" LIMIT " + start + ", 8;";
+		
+		return getBooksFromDB(genreBasedSearchQuery);
+	}
+	
+	public HashMap<String, Livre> search(String searchTerm) {
+		HashMap<String, Livre> searchedBooks = new HashMap<String, Livre>();
 		
 		String authorBasedSearchQuery = "SELECT * FROM books\r\n"
 										+ "WHERE authName LIKE \"%" + searchTerm + "%\";";
@@ -108,7 +190,7 @@ public class ConnectionDB {
 										+ "WHERE title LIKE \"%" + searchTerm + "%\";";
 		
 		
-		searchedBooks.putAll(getBooksFromDB(genreBasedSearchQuery));
+		searchedBooks.putAll(genreBasedSearch(searchTerm));
 		searchedBooks.putAll(getBooksFromDB(authorBasedSearchQuery));
 		searchedBooks.putAll(getBooksFromDB(titleBasedSearchQuery));
 		return searchedBooks;

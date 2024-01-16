@@ -2,7 +2,6 @@ package Administrator;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -10,7 +9,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -18,17 +16,20 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.border.EmptyBorder;
-
+import BookBoutique.ConnectionDB;
 import BookBoutique.Controlleur;
 
 public class Admin extends JFrame implements ActionListener
 {
 	static public JButton users, books, genres, accueil, searchButton;
+	public static JPanel rightWrapper;
+	GenrePanel genrePanel;
+	BooksPanel bookPanel;
 	
 	
 	public Admin() {
+		this.genrePanel = new GenrePanel();
+		this.bookPanel = new BooksPanel("");
 		setLayout(new BorderLayout());
 		setIconImage(Controlleur.logo.getImage());
 		setTitle("BookBoutique");
@@ -55,6 +56,8 @@ public class Admin extends JFrame implements ActionListener
 		genres = new JButton("Genres");
 		accueil = new JButton("Accueil");
 		
+		genres.addActionListener(this);
+		
 		buttonHolder.setLayout(new BoxLayout(buttonHolder, BoxLayout.Y_AXIS));
 		buttonHolder.add(buttonHelper(users, Controlleur.fixResolution(new ImageIcon("src\\Images\\user.png"), 60, 60)));
 		buttonHolder.add(buttonHelper(books, Controlleur.fixResolution(new ImageIcon("src\\Images\\book.png"), 60, 60)));
@@ -77,36 +80,49 @@ public class Admin extends JFrame implements ActionListener
 		
 		return headerPanel;
 	}
+	
 	private JPanel rightSidePanel() {
-		JPanel rightWrapper = new JPanel(new BorderLayout());
+		rightWrapper = new JPanel(new BorderLayout());
 		JPanel innerPanel = new JPanel();
-		//JTextField search = new JTextField(80);
-		
-		//JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		JPanel firstSet = new JPanel(new FlowLayout(FlowLayout.CENTER, 32, 0));
 		JPanel secondSet = new JPanel(new FlowLayout(FlowLayout.CENTER, 32, 0));
 		JPanel thirdSet = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		
-		//searchButton = new JButton("search");
-		//searchPanel.add(Box.createVerticalStrut(80));
-		//searchPanel.add(search);
-		//searchPanel.add(searchButton);
+		RoundedPanel bookPanel = new RoundedPanel("src\\Images\\booksIcon.png", 300, 150, new int[] {20, 40, 80, 80});
+		RoundedPanel genresPanel = new RoundedPanel("src\\Images\\genre.png", 300, 150, new int[] {20, 40, 80, 80});
+		RoundedPanel usersPanel = new RoundedPanel("src\\Images\\users.png", 300, 150, new int[] {20, 40, 80, 80});
+		RoundedPanel commentsPanel = new RoundedPanel("src\\Images\\comments.png", 300, 150, new int[] {20, 40, 80, 80});
+		RoundedPanel ordersPanel = new RoundedPanel("src\\Images\\Orders.png", 300, 150, new int[] {20, 40, 80, 80});
+
+		bookPanel.insertLabel("Books", 130, 60, 100, 20, 25);
+		bookPanel.insertLabel(Integer.toString(ConnectionDB.getCount("books")), 130, 80, 100, 20, 15);
+		
+		genresPanel.insertLabel("Genres", 130, 60, 100, 20, 25);
+		genresPanel.insertLabel(Integer.toString(ConnectionDB.getCount("genres")), 130, 80, 100, 20, 15);
+		
+		usersPanel.insertLabel("Users", 130, 60, 100, 20, 25);
+		usersPanel.insertLabel(Integer.toString(ConnectionDB.getCount("users")), 130, 80, 100, 20, 15);
+		
+		commentsPanel.insertLabel("Comments", 130, 60, 170, 20, 25);
+		commentsPanel.insertLabel(Integer.toString(ConnectionDB.getCount("comments")), 130, 80, 100, 20, 15);
+		
+		ordersPanel.insertLabel("Orders", 130, 60, 100, 20, 25);
+		ordersPanel.insertLabel(Integer.toString(ConnectionDB.getCount("orders")), 130, 80, 100, 20, 15);
 		
 		innerPanel.setLayout(new BoxLayout(innerPanel, BoxLayout.Y_AXIS));
 		
-		firstSet.add(new RoundedPanel("src\\Images\\booksIcon.png", "Books", 18));
-		firstSet.add(new RoundedPanel("src\\Images\\genre.png", "Genres", 18));
+		firstSet.add(bookPanel);
+		firstSet.add(genresPanel);
 		
-		secondSet.add(new RoundedPanel("src\\Images\\users.png", "Users", 18));
-		secondSet.add(new RoundedPanel("src\\Images\\comments.png", "Comments", 18));
+		secondSet.add(usersPanel);
+		secondSet.add(commentsPanel);
 		
-		thirdSet.add(new RoundedPanel("src\\Images\\Orders.png", "Orders", 18));
+		thirdSet.add(ordersPanel);
 
 		innerPanel.add(Box.createVerticalStrut(30));
 		innerPanel.add(firstSet);
 		innerPanel.add(secondSet);
 		innerPanel.add(thirdSet);
-		//innerPanel.add(Box.createVerticalStrut(20));
 		
 		rightWrapper.add(innerPanel, BorderLayout.CENTER);
 		
@@ -149,6 +165,19 @@ public class Admin extends JFrame implements ActionListener
 		if (e.getSource() == users) {
 			
 		}
+		if (e.getSource() == genres) {
+			removeAndAdd(genrePanel);
+		}
+		if (e.getSource() == books) {
+			removeAndAdd(bookPanel);
+		}
+	}
+	
+	public void removeAndAdd(JPanel addition) {
+		rightWrapper.removeAll();
+		rightWrapper.add(addition, BorderLayout.CENTER);
+		rightWrapper.revalidate();
+		rightWrapper.repaint();
 	}
 	
 	
