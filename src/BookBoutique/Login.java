@@ -17,6 +17,16 @@ import java.util.Map.Entry;
 
 import javax.swing.border.BevelBorder;
 
+import com.toedter.calendar.JDateChooser;
+
+//import connections.ConnexionDB;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -28,33 +38,39 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-
+import java.sql.Connection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
+import java.util.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
 public class Login extends JFrame {
 	//User's info
 	char seXe;
 	int agE;
+	public ConnectionDB connection = Controlleur.connection;
 	String userName, passWord, passWordComfirm, firstName, lastName, emaiL;
 	//Class attributes
 	JTextField usernameTextField;
 	JTextField passwordTextField;
 	JTextField confirmPWDTextField;
 	JTextField emailTextField;
-	JTextField ageTextField;
+	JDateChooser dobChooser; //del
 	JTextField fNameTextField;
 	JTextField lNameTextField;
 	JLabel ageError;
 	//Checkers
-	boolean pwdChecker = false, ageChecker = true, allFieldsChecker = false,
+	boolean pwdChecker = false, ageChecker = false, allFieldsChecker = false,
 			existantUsername = false, wrongPassword = false, sexeSelected = false,
 			isMaleSelected, isFemaleSelected, connected = false, firstOpen = true;
 	//hashmap for reading files
 	public static HashMap<String, User> users = new HashMap<String, User>();
+	public static User newUser;
 	
 	//class constructor
 	public Login() {
@@ -65,6 +81,7 @@ public class Login extends JFrame {
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setResizable(false);
 		setVisible(false);
+		//ConnectionDB();
 	}
 	
 	/**
@@ -144,18 +161,22 @@ public class Login extends JFrame {
 				if(!leftChecks()) {
 					setErrorlabelVisible(passwordError, "Fill all text fields");
 				}
-				else if(wrongPassword) {
+				else if(!wrongPassword) {
 					setErrorlabelVisible(passwordError, "Wrong password");
 				}
 				else if (!existantUsername) {
 					setErrorlabelVisible(usernameError, "Please register first");
 				}
-				else if (existantUsername && !wrongPassword) {
+				else if (existantUsername && wrongPassword) {
+					System.out.println("can login");
 					connected = true;
 					Controlleur.onHover(Controlleur.loginButton, "Log Out");
-		    		Controlleur.cart.loadCart();
 					dispose();
+					Controlleur.connectedUser = newUser;
+		    		Controlleur.cart.loadCart();
 					Controlleur.aboutUs.setTextFields(Controlleur.connectedUser);
+					Controlleur.userType(Controlleur.connectedUser);
+					System.out.println(userToString(newUser));
 				}
 				revalidate();
 				repaint();
@@ -298,7 +319,7 @@ public class Login extends JFrame {
 		
 		ageError = new JLabel();
 		JLabel age = new JLabel();
-		ageTextField = new JTextField();
+		dobChooser = new JDateChooser();
 		
 		JPanel gender = new JPanel();
 		JLabel genderText = new JLabel("Gender");
@@ -335,11 +356,11 @@ public class Login extends JFrame {
 		setTextFields(confirmPWDTextField, 150, 260, 200, 20);
 		setErrorlabelVisibles(confirmPWDError, "Password doesn't match", 150, 285, 140, 15, 10);
 		
-		setLabels(age, "Age", 140, 300, 50, 50, 15, Color.decode("#625b51"));
-		ageTextField.setBounds(180, 314, 40, 20);
-		setErrorlabelVisibles(ageError, "Age out of range", 165, 337, 70, 15, 10);
+		setLabels(age, "Age", 130, 300, 50, 50, 15, Color.decode("#625b51"));
+		dobChooser.setBounds(170, 314, 100, 20);
+		setErrorlabelVisibles(ageError, "Age out of range", 273	, 315, 70, 15, 10);
 		
-		setPanel(gender, 230, 308, 160, 50, 15);
+		setPanel(gender, 130, 338, 160, 50, 15);
 		setLabels(genderText, "Gender:", 230, 300, 100, 50, 15, Color.decode("#625b51"));
 		setErrorlabelVisibles(genderError, "Select a gender", 230, 337, 88, 15, 10);
 		male.setBounds(300, 320, 50, 10);
@@ -374,7 +395,6 @@ public class Login extends JFrame {
             public void focusGained(FocusEvent e) {
             	
             }
-
             @Override
             public void focusLost(FocusEvent e) {
             	if (existantLoginUsername(usernameTextField.getText().trim())) {
@@ -440,7 +460,7 @@ public class Login extends JFrame {
             }
         });
 		
-		ageTextField.addFocusListener(new FocusListener() {
+		dobChooser.addFocusListener(new FocusListener() {
             @Override
             public void focusGained(FocusEvent e) {
             	
@@ -448,11 +468,13 @@ public class Login extends JFrame {
 
             @Override
             public void focusLost(FocusEvent e) {
-            	if (ageCheck()) {
+            	if (dobChooser.getDate() == null) {
             		setErrorlabelVisible(ageError, "Age invalid");
+            		System.out.println("Date is: " + dobChooser.getDate());
             	}
             	else {
             		setErrorlabelInvisible(ageError);
+            		System.out.println("Date not is: " + dobChooser.getDate());
             	}
             	
             }
@@ -502,8 +524,11 @@ public class Login extends JFrame {
 				   firstName = fNameTextField.getText().trim();
 				   lastName = lNameTextField.getText().trim();
 				   emaiL = emailTextField.getText().trim();
+				   ageCheck();
 				   empty();
 				   allChecks(allFieldsError);
+				   
+				   //System.out.println("Date is: " + dobChooser.getDate());
 			   }
 			});
 		
@@ -538,7 +563,7 @@ public class Login extends JFrame {
 		contentHolder.add(confirmPWDTextField);
 		contentHolder.add(confirmPWDError);
 		contentHolder.add(age);
-		contentHolder.add(ageTextField);
+		contentHolder.add(dobChooser);
 		contentHolder.add(ageError);
 		contentHolder.add(gender);
 		
@@ -568,10 +593,10 @@ public class Login extends JFrame {
 		boolean userName = usernameTextField.getText().trim().isEmpty();
 		boolean firstName = fNameTextField.getText().trim().isEmpty();
 		boolean familyName = lNameTextField.getText().trim().isEmpty();
-		boolean age = ageTextField.getText().isEmpty();
+		Date dob = dobChooser.getDate();
 		String mail = emailTextField.getText().trim();
 		
-		if ((pwd || comfirmPwd || userName || firstName || familyName || age || existantEmail(mail) || sexeSelected())) {
+		if ((pwd || comfirmPwd || userName || firstName || familyName || (dob == null) || existantEmail(mail) || sexeSelected())) {
 			allFieldsChecker = true;
 			return true;
 		}
@@ -647,56 +672,102 @@ public class Login extends JFrame {
 	 */
 	
 	private void allChecks(JLabel allFieldsError) {
-		if (!empty() && sexeSelected  && ageChecker && !existantEmail(emaiL) && isValidEmail(emaiL) && !existantLoginUsername(userName)) {
-			String[] userString = new String[7];
-			userString[0] = userName;
-			userString[1] = passWord; 
-			userString[2] = firstName;
-			userString[3] = lastName; 
-			userString[4] = String.valueOf(seXe); 
-			userString[5] = emaiL;
-			userString[6] = Integer.toString(agE);
-			User newUser = new User(userString);
-			users.put(userName, newUser);
-			connected = true;
-			for (HashMap.Entry<String, User> entry : users.entrySet()) {
-	            User user = entry.getValue();
-	            saveToFile(user);
-	        }
-    		Controlleur.onHover(Controlleur.loginButton, "Log Out");
-    		Controlleur.connectedUser = newUser;
-    		dispose();
-    		Controlleur.aboutUs.setTextFields(Controlleur.connectedUser);
-
-			}
-		if (empty()){
+		if(empty()) {
 			allFieldsError.setVisible(true);
 		}
+			/*SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+			Date legalDate;
+			try {
+				legalDate = dateFormat.parse("15/01/2006"); //I'm no pedo					
+				if (dobChooser.getDate() == null || dobChooser.getDate().after(legalDate)) {
+					setErrorlabelVisible(ageError, "Age invalid");
+				}
+				else 
+					ageError.setVisible(false);
+					ageChecker = true;
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}*/
+		
+		else if (!empty() && sexeSelected  && ageChecker && !existantEmail(emaiL) && isValidEmail(emaiL) && !existantLoginUsername(userName)) {
+			try {
+				System.out.println("" + !empty() + sexeSelected  + ageChecker + !existantEmail(emaiL) + isValidEmail(emaiL) + !existantLoginUsername(userName));
+                String addUserQuery = "INSERT INTO `users`(`username`, `pwd`, `fname`, `lname`, `sexe`, `email`, `userType`, `dob`) "
+                				+ "	VALUES (?,?,?,?,?,?,?,?);";
+                
+                try (PreparedStatement preparedStatement = ConnectionDB.con.prepareStatement(addUserQuery)) {
+                    // Set values in the prepared statement
+                    preparedStatement.setString(1, userName);
+                    preparedStatement.setString(2, passWord);
+                    preparedStatement.setString(3, firstName);
+                    preparedStatement.setString(4, lastName);
+                    preparedStatement.setString(5, String.valueOf(seXe));
+                    preparedStatement.setString(6, emaiL);
+                    preparedStatement.setString(7, "Regular");
+                    
+                    // Convert java.util.Date to java.sql.Date for dob
+                    java.sql.Date sqlDate = new java.sql.Date(dobChooser.getDate().getTime());
+                    preparedStatement.setDate(8, sqlDate);
+                    
+                    // Execute the update
+                    int rowsAffected = preparedStatement.executeUpdate();
+                    
+                    if (rowsAffected > 0) {
+                        connected = true;
+                        System.out.println("Ajout reussi");
+                        String[] userString = new String[7];
+                        userString[0] = userName;
+                        userString[1] = passWord;
+                        userString[2] = firstName;
+                        userString[3] = lastName;
+                        userString[4] = String.valueOf(seXe);
+                        userString[5] = emaiL;
+                        userString[6] = "Regular";
+                        //userString[7] = dobChooser.getDateFormatString();
+                        
+                        newUser = new User(userString);
+                        System.out.println(userToString(newUser));
+                        users.put(userName, newUser);
+                    } else {
+                    	System.out.println("Ajout non reussi");
+                    }
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                // Handle the SQL exception
+            }
+    		Controlleur.onHover(Controlleur.loginButton, "Log Out");
+    		dispose();
+    		Controlleur.connectedUser = newUser;
+    		Controlleur.aboutUs.setTextFields(Controlleur.connectedUser);
+    		Controlleur.userType(Controlleur.connectedUser);
+    		System.out.println("got here");
+			}
+		
 		revalidate();
 		repaint();
 	}
-	
+
 	/**
 	 * ageCheck - checks if the age entered is valid or not
 	 * @return: true if the age is either out of bounds or not integer, and false otherwise
 	 */
 	
-	private boolean ageCheck() {
+	private void ageCheck() {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		Date legalDate;
 		try {
-			   agE = Integer.parseInt(ageTextField.getText());
-		   }
-		   catch (Exception e) {
-			   ageChecker = false;
-			   return true;
-		   }
-			if (agE < 16 || agE > 99) {
-				   ageChecker = false;
-				   return true;
-			   }
-			else {
-				ageChecker = true;
-				return false;
+			legalDate = dateFormat.parse("15/01/2006"); //I'm no pedo					
+			if (dobChooser.getDate() == null || dobChooser.getDate().after(legalDate)) {
+				setErrorlabelVisible(ageError, "Age invalid");
+				ageChecker = false;
 			}
+			else 
+				ageError.setVisible(false);
+				ageChecker = true;
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	/**
@@ -705,14 +776,14 @@ public class Login extends JFrame {
 	 * @return a string of the user's attributes 
 	 */
 	
-	private static String userToString(User user) {
+	private  String userToString(User user) {
         // Convert the User object to a string representation
         return user.userName + "²" + user.password + "²" + user.firstName + 
-        		"²" + user.familyName + "²" + user.sexe + "²" + user.email + "²" + user.age + System.lineSeparator();
+        		"²" + user.familyName + "²" + user.sexe + "²" + user.email + "²" + user.type/*+ "²" + dobChooser.getDate() +*/ + System.lineSeparator();
     }
 	
 	/**
-	 * leftChecks - checks if all login fields aree filled
+	 * leftChecks - checks if all login fields are filled
 	 * @return true if both r full and false otherwise
 	 */
 	
@@ -745,13 +816,29 @@ public class Login extends JFrame {
 	 */
 	
 	private boolean existantLoginUsername(String n) {
-		ArrayList<User> usersList = User.getUsers();
-		for(User currUser : usersList) {
-			if (currUser.userName.equalsIgnoreCase(n)) {
-				Controlleur.connectedUser = currUser;
-				return true;
-			}
-		}
+		String existantUsernameCheck = "SELECT * FROM users WHERE username LIKE ?";
+        try (PreparedStatement preparedStatement = ConnectionDB.con.prepareStatement(existantUsernameCheck)) {
+            preparedStatement.setString(1, "%" + n + "%");
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            //int count = resultSet.next();
+            String[] userString = new String[7];
+            while (resultSet.next()) {
+            	userString[0] = resultSet.getString("username");
+            	userString[1] = resultSet.getString("pwd");
+            	userString[2] = resultSet.getString("fname");
+            	userString[3] = resultSet.getString("lname");
+            	userString[4] = String.valueOf(resultSet.getString("sexe"));
+            	userString[5] = resultSet.getString("email");
+            	userString[6] = resultSet.getString("userType");
+            	System.out.println("the user exists");
+            	newUser = new User(userString);
+                return true;
+            }
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 		return false;
 	}
 	
@@ -762,17 +849,24 @@ public class Login extends JFrame {
 	 */
 	
 	private boolean existantEmail(String email) {
-		ArrayList<User> usersList = User.getUsers();
-		for(User currUser : usersList) {
-			if (currUser.email.equals(email)) {
-					return true;
-			}
-		}
+		String existantEmailCheck = "SELECT COUNT(*) FROM users WHERE email = ?";
+        try (PreparedStatement preparedStatement = ConnectionDB.con.prepareStatement(existantEmailCheck)) {
+            preparedStatement.setString(1, email);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+                if (resultSet.next()) {
+                	if (resultSet.getInt(1) > 0) {
+	                    return true;
+                	}
+                }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 		return false;
 	}
 	
 	/**
-	 * passwordCorred - checks if a password is correct for a given username
+	 * passwordCorrect - checks if a password is correct for a given username
 	 * @param username: the username to check the password for
 	 * @param password: the password entered to compare with the one in the file
 	 * @return true if the password is incorrect and false otherwise
@@ -780,15 +874,21 @@ public class Login extends JFrame {
 	
 	//returns true if the pwd is wrong n false if iss correct 
 	private boolean passwordCorrect(String username, String password) {
-		ArrayList<User> usersList = User.getUsers();
-		for(User currUser : usersList) {
-			if (currUser.userName.equalsIgnoreCase(username)) {
-				if (!currUser.password.equals(password)) {
-					return true;
-				}
-			}
-		}
-		return false;
+		String sql = "SELECT pwd FROM users WHERE username = ?";
+        try (PreparedStatement preparedStatement = ConnectionDB.con.prepareStatement(sql)) {
+            preparedStatement.setString(1, username);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            resultSet.next();
+            String storedPassword = resultSet.getString("pwd");
+            //boolean res = storedPassword.equals(password);
+            if (storedPassword.equals(password))
+            	return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Handle the SQL exception
+        }
+        return false;
 	}
 	
 	/**

@@ -171,6 +171,9 @@ public class Admin extends JFrame implements ActionListener
 		if (e.getSource() == books) {
 			removeAndAdd(bookPanel);
 		}
+		if (e.getSource() == accueil) {
+			showRegular();
+		}
 	}
 	
 	public void removeAndAdd(JPanel addition) {
@@ -180,6 +183,9 @@ public class Admin extends JFrame implements ActionListener
 		rightWrapper.repaint();
 	}
 	
-	
+	public void showRegular() {
+		Controlleur.controlleur.setVisible(true);
+		this.setVisible(false);
+	}
 }
 

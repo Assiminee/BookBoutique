@@ -11,9 +11,11 @@ import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
+import java.awt.event.MouseListener;
 import java.util.HashMap;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -45,13 +47,14 @@ public class Controlleur extends JFrame implements ActionListener
 {
 	// Class Variables
 	static public ImageIcon logo;
-	public static JPanel innerPanel;
+	public static JPanel innerPanel, head;
 	public static JButton accueilButton, catalogButton, loginButton, search, aboutUsButton, cartButton/*, inboxButton*/;
 	private JTextField searchBar;
 	static public User connectedUser = null;
+	static public Controlleur controlleur;
 	
 	private Accueil accueil;
-	private Admin admin;
+	public static Admin admin;
 	static public AboutUs aboutUs;
 	private Catalogue catalog;
 	static public Login login = null;
@@ -63,13 +66,13 @@ public class Controlleur extends JFrame implements ActionListener
 	public Controlleur()
 	{		
 		// Setting class variables
+		controlleur = this;
 		Controlleur.logo = new ImageIcon("src\\Images\\books.png");
 		Controlleur.cart = new Cart();
 		Controlleur.more = new More();
 		Controlleur.connection = new ConnectionDB();
 		this.accueil = new Accueil(Controlleur.connection.getBooksFromDB("Select * FROM books LIMIT 36"), "");
 		this.catalog = new Catalogue();
-		this.admin = new Admin();
 		
 		// Setting the JFrame
 		setLayout(new BorderLayout());
@@ -127,7 +130,7 @@ public class Controlleur extends JFrame implements ActionListener
 	 */
 	private JPanel header()
 	{
-		JPanel head = new JPanel(new BorderLayout());
+		head = new JPanel(new BorderLayout());
 		JLabel iconHolder = new JLabel();
 		JLabel titre = new JLabel("BookBoutique");
 
@@ -437,5 +440,42 @@ public class Controlleur extends JFrame implements ActionListener
     		login = null;
     		connectedUser = null;
     	}
+	}
+	
+	public static void userType(User user) {
+		if (user.type.equals("Admin")) {
+			JLabel test = new JLabel();
+			test.setText("    ");
+			test.setHorizontalTextPosition(JLabel.RIGHT);
+			test.setIcon(fixResolution(new ImageIcon("src\\Images\\admin.png"), 60, 60));
+			head.add(test, BorderLayout.EAST);
+			admin = new Admin();
+			controlleur.setVisible(false);
+			test.addMouseListener(new MouseListener() {
+				@Override
+	            public void mouseClicked(MouseEvent e) {
+	            	admin.setVisible(true);
+	            	controlleur.setVisible(false);
+	            }
+	
+	            @Override
+	            public void mousePressed(MouseEvent e) {
+	            	
+	            }
+	
+	            @Override
+	            public void mouseReleased(MouseEvent e) {
+	                // Action à effectuer lors du relâchement du bouton de la souris
+	            }
+	
+	            @Override
+			    public void mouseEntered(MouseEvent e) {
+			    }
+	
+	            @Override
+			    public void mouseExited(MouseEvent e) {
+			    }
+	    });
+		}
 	}
 }

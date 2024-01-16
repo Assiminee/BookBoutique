@@ -9,4 +9,5 @@ module BookBoutique {
 	requires java.sql;
 	requires java.activation;
 	requires java.mail;
+	requires jcalendar;
 }
