@@ -24,14 +24,17 @@ import BookBoutique.Livre;
 
 public class GenrePanel extends JPanel implements ActionListener
 {
-	private JButton previous = new JButton("Previous"), next= new JButton("Next");
+	private JButton previous = new JButton("Previous"), next= new JButton("Next"), search;
 	private int pageNumber = 0, numberOfPages, genreCount;
 	private JPanel innerPanel, JFWrapper;
 	private JFrame newGenre;
+	private String halfQuery;
+	private JTextField searchField;
 	
-	public GenrePanel() {
+	public GenrePanel(String searchTerm) {
+		this.halfQuery = searchTerm.isEmpty() ? "genres" : "genres WHERE title LIKE \"%" + searchTerm + "%\"";
 		this.newGenre = addGenre();
-		this.genreCount = ConnectionDB.getCount("genres");
+		this.genreCount = ConnectionDB.getCount(halfQuery);
 		
 		this.numberOfPages = (int) (genreCount / 11);
 		
@@ -39,7 +42,7 @@ public class GenrePanel extends JPanel implements ActionListener
 			this.numberOfPages++;
 		}
 		
-		this.innerPanel = createInnerPanel(0);
+		this.innerPanel = createInnerPanel(Controlleur.connection.getNGenres(halfQuery, 0, 11));
 		
 		setLayout(new BorderLayout());
 		
@@ -52,20 +55,20 @@ public class GenrePanel extends JPanel implements ActionListener
 		setVisible(true);
 	}
 	
-	public static JPanel createSearchBar() {
+	public JPanel createSearchBar() {
 		JPanel searchHolder = new JPanel(new FlowLayout(FlowLayout.CENTER));
-		JTextField searchField = new JTextField(80);
-		JButton searchButton = new JButton("Search");
+		searchField = new JTextField(80);
+		search = new JButton("Search");
 		
+		search.addActionListener(this);
 		searchHolder.add(searchField);
-		searchHolder.add(searchButton);
+		searchHolder.add(search);
 		return searchHolder;
 	}
 	
-	private JPanel createInnerPanel(int start) {
+	private JPanel createInnerPanel(ArrayList<String> genreArray) {
 		innerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		JPanel genreHolder = new JPanel(new GridLayout(4, 3, 25, 25));
-		ArrayList<String> genreArray = Controlleur.connection.getNGenres("genres", start, 11);
 		
 		for (String genre : genreArray) {
 			RoundedPanel genrePanel = new RoundedPanel("", 335, 100, new int[] {});
@@ -159,7 +162,7 @@ public class GenrePanel extends JPanel implements ActionListener
 			public void actionPerformed(ActionEvent e) {
 				if (buttonLabel.equals("Books")) {
 					Admin.rightWrapper.removeAll();
-					Admin.rightWrapper.add(new BooksPanel(genre));
+					Admin.rightWrapper.add(new BooksPanel(genre, false));
 					Admin.rightWrapper.revalidate();
 					Admin.rightWrapper.repaint();
 				}
@@ -186,11 +189,14 @@ public class GenrePanel extends JPanel implements ActionListener
 				removeAndAdd(pageNumber == 0 ? 11 : pageNumber * 11);
 			}
 		}
+		else if (e.getSource() == search) {
+			Admin.removeAndAdd(new GenrePanel(searchField.getText()));
+		}
 	}
 	
 	private void removeAndAdd(int start) {
 		this.remove(innerPanel);
-		innerPanel = createInnerPanel(start);
+		innerPanel = createInnerPanel(Controlleur.connection.getNGenres(halfQuery, start, 11));
 		add(innerPanel, BorderLayout.CENTER);
 		revalidate();
 		repaint();

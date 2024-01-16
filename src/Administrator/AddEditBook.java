@@ -18,6 +18,7 @@ import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -25,6 +26,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import BookBoutique.ConnectionDB;
 import BookBoutique.Controlleur;
 import BookBoutique.Livre;
 
@@ -34,7 +36,7 @@ public class AddEditBook extends JFrame
 	private static AddEditBook instance;
 	private String bookTitle;
 	private JTextField title, authName, price, quantity;
-	private JTextArea synopsis;
+	private JTextArea synopsis, genresArea;
 	private boolean added = false;
 	private ArrayList<String> book;
 	public AddEditBook() {
@@ -63,21 +65,32 @@ public class AddEditBook extends JFrame
 	}
 	private RoundedPanel fieldsPanel() {
 		RoundedPanel fullPanel = new RoundedPanel(book != null ? book.get(5) : "src\\Images\\empty.jpg", 500, 500, new int[] {20, 20, 100, 140});
+		ArrayList<String> bookGenres = book != null ? Controlleur.connection.getAllGenres("SELECT DISTINCT g.title FROM genres g\r\n"
+				+ "INNER JOIN belongto bt ON g.ID = bt.genreID INNER JOIN books b ON bt.bookID = b.ID\r\n"
+				+ "WHERE b.ID = (SELECT ID FROM books WHERE title LIKE \"%" + book.get(0) + "%\");") : null;
+		String genres = book != null ? arrListToString(bookGenres) : "";
 		
 		fullPanel.insertLabel("Title: ", 155, 45, 60, 20, 20);
 		fullPanel.add(title = generateRow(book != null ? book.get(0) : "", 220, 40, 240, 30));
 		
-		fullPanel.insertLabel("Author: ", 130, 115, 90, 20, 20);
-		fullPanel.add(authName = generateRow(book != null ? book.get(1) : "", 220, 110, 240, 30));
+		fullPanel.insertLabel("Author: ", 130, 80, 90, 20, 20);
+		fullPanel.add(authName = generateRow(book != null ? book.get(1) : "", 220, 75, 240, 30));
 		
-		fullPanel.insertLabel("Price: ", 125, 190, 60, 20, 20);
-		fullPanel.add(price = generateRow(book != null ? book.get(2) : "", 185, 185, 75, 30));
+		fullPanel.insertLabel("Price: ", 125, 120, 60, 20, 20);
+		fullPanel.add(price = generateRow(book != null ? book.get(2) : "", 185, 115, 75, 30));
 		
-		fullPanel.insertLabel("Quantity: ", 285, 190, 120, 20, 20);
-		fullPanel.add(quantity = generateRow(book != null ? book.get(3) : "", 385, 185, 75, 30));
+		fullPanel.insertLabel("Quantity: ", 285, 120, 120, 20, 20);
+		fullPanel.add(quantity = generateRow(book != null ? book.get(3) : "", 385, 115, 75, 30));
+
+		fullPanel.insertLabel("Select Genre: ", 30, 170, 190, 20, 20);
+		fullPanel.add(generateComboBox(bookGenres, genresArea));
+		fullPanel.insertLabel("Genres: ", 30, 220, 120, 20, 20);
+		fullPanel.add(genresArea = generateTextArea(genres, 125, 220, 335, 100));
 		
-		fullPanel.insertLabel("Synopsis: ", 20, 250, 120, 20, 20);
-		fullPanel.add(synopsis = generateTextArea(book != null ? book.get(4) : "", 125, 250, 335, 200));
+		
+		
+		fullPanel.insertLabel("Synopsis: ", 20, 330, 120, 20, 20);
+		fullPanel.add(synopsis = generateTextArea(book != null ? book.get(4) : "", 125, 330, 335, 100));
 		
 		fullPanel.add(generateButtons("Upload Image", 105, 460, 140, 35, () -> uploadImage(fullPanel)));
 		fullPanel.add(generateButtons("Add", 255, 460, 140, 35, () -> System.out.println("Test")));
@@ -85,6 +98,40 @@ public class AddEditBook extends JFrame
 		return fullPanel;
 	}
 	
+	private String arrListToString(ArrayList<String> list) {
+		StringBuilder res = new StringBuilder();
+		
+		for (int i = 0; i < list.size(); i++) {
+			if (i != 0)
+				res.append(",");
+			res.append(list.get(i));
+		}
+		return res.toString();
+	}
+	private JComboBox<String> generateComboBox(ArrayList<String> selectedGenres, JTextArea genreArea) {
+		int i = 0;
+		String[] options = new String[ConnectionDB.getCount("genres")];
+		for (String genre : Controlleur.connection.getAllGenres("SELECT title FROM genres")) {
+			options[i++] = genre;
+		}
+		JComboBox<String> comboBox = new JComboBox<String>(options);
+		comboBox.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String genre = (String) comboBox.getSelectedItem();
+				if (!genreArea.getText().contains(genre)) {
+					genreArea.append(genre + ",");
+				}
+				else {
+					genreArea.setText(genreArea.getText().replaceAll("\\b" + genre + "\\b(?:,)?", ""));
+				}
+			}
+		});
+		comboBox.setBounds(230, 170, 200, 30);
+		
+		return comboBox;
+	}
 	private JButton generateButtons(String title, int x, int y, int width, int height, Runnable codeToRun) {
 		JButton btn = new JButton(title);
 		
@@ -139,6 +186,7 @@ public class AddEditBook extends JFrame
             // absolute 
             File selectedFile = fileChooser.getSelectedFile();
             String image = copyImageToRessources(selectedFile);
+            System.out.println(image);
             try {
 				panel.image = ImageIO.read(new File(image));
 			} catch (IOException e) {
@@ -161,10 +209,10 @@ public class AddEditBook extends JFrame
 
             dest = folderPath.resolve(sourceFile.getName());
             Files.copy(sourceFile.toPath(), dest, StandardCopyOption.REPLACE_EXISTING);
-            System.out.println(dest);
+            //System.out.println(dest);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return dest.toString();
+        return "src/Images/" + sourceFile.getName();
     }
 }

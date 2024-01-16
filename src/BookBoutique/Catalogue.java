@@ -21,7 +21,7 @@ public class Catalogue extends JPanel {
 	
 	public Catalogue() {
 		
-		this.genres = Controlleur.connection.getAllGenres();
+		this.genres = Controlleur.connection.getAllGenres("SELECT title FROM genres");
 		
 		setLayout(new BorderLayout());
 		add(Controlleur.scrollPane(createJPanels(), getWidth(), getHeight()), BorderLayout.CENTER);

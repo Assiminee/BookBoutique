@@ -37,14 +37,14 @@ public class ConnectionDB {
 		}
 	}
 	
-	public ArrayList<String> getAllGenres() {
+	public ArrayList<String> getAllGenres(String query) {
 		ArrayList<String> allGenres = new ArrayList<String>();
 		
 		Statement stm;
 		ResultSet res;
 		try {
 			stm = con.createStatement();
-			res = stm.executeQuery("SELECT title FROM genres");
+			res = stm.executeQuery(query/*"SELECT title FROM genres"*/);
 			while (res.next()) {
 				allGenres.add(res.getString(1));
 			}
@@ -171,6 +171,12 @@ public class ConnectionDB {
 		return getCount(query);
 	}
 	
+	public int getBookCountSearch(String searchTerm) {
+		String query = "(SELECT * FROM books b\r\n"
+						+ "WHERE title LIKE \"%" + searchTerm + "%\") AS test;";
+		
+		return getCount(query);
+	}
 	public HashMap<String, Livre> test(String searchTerm, int start) {
 		String genreBasedSearchQuery = "SELECT DISTINCT b.* FROM books b\r\n"
 										+ "INNER JOIN belongto bt ON b.ID = bt.bookID\r\n"

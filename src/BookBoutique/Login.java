@@ -168,7 +168,6 @@ public class Login extends JFrame {
 					setErrorlabelVisible(usernameError, "Please register first");
 				}
 				else if (existantUsername && wrongPassword) {
-					System.out.println("can login");
 					connected = true;
 					Controlleur.onHover(Controlleur.loginButton, "Log Out");
 					dispose();
@@ -176,7 +175,6 @@ public class Login extends JFrame {
 		    		Controlleur.cart.loadCart();
 					Controlleur.aboutUs.setTextFields(Controlleur.connectedUser);
 					Controlleur.userType(Controlleur.connectedUser);
-					System.out.println(userToString(newUser));
 				}
 				revalidate();
 				repaint();
@@ -470,11 +468,9 @@ public class Login extends JFrame {
             public void focusLost(FocusEvent e) {
             	if (dobChooser.getDate() == null) {
             		setErrorlabelVisible(ageError, "Age invalid");
-            		System.out.println("Date is: " + dobChooser.getDate());
             	}
             	else {
             		setErrorlabelInvisible(ageError);
-            		System.out.println("Date not is: " + dobChooser.getDate());
             	}
             	
             }
@@ -527,9 +523,7 @@ public class Login extends JFrame {
 				   ageCheck();
 				   empty();
 				   allChecks(allFieldsError);
-				   
-				   //System.out.println("Date is: " + dobChooser.getDate());
-			   }
+				   }
 			});
 		
 		goBack.addActionListener(new ActionListener() {
@@ -691,7 +685,6 @@ public class Login extends JFrame {
 		
 		else if (!empty() && sexeSelected  && ageChecker && !existantEmail(emaiL) && isValidEmail(emaiL) && !existantLoginUsername(userName)) {
 			try {
-				System.out.println("" + !empty() + sexeSelected  + ageChecker + !existantEmail(emaiL) + isValidEmail(emaiL) + !existantLoginUsername(userName));
                 String addUserQuery = "INSERT INTO `users`(`username`, `pwd`, `fname`, `lname`, `sexe`, `email`, `userType`, `dob`) "
                 				+ "	VALUES (?,?,?,?,?,?,?,?);";
                 
@@ -726,7 +719,6 @@ public class Login extends JFrame {
                         //userString[7] = dobChooser.getDateFormatString();
                         
                         newUser = new User(userString);
-                        System.out.println(userToString(newUser));
                         users.put(userName, newUser);
                     } else {
                     	System.out.println("Ajout non reussi");
@@ -741,7 +733,6 @@ public class Login extends JFrame {
     		Controlleur.connectedUser = newUser;
     		Controlleur.aboutUs.setTextFields(Controlleur.connectedUser);
     		Controlleur.userType(Controlleur.connectedUser);
-    		System.out.println("got here");
 			}
 		
 		revalidate();
@@ -831,7 +822,6 @@ public class Login extends JFrame {
             	userString[4] = String.valueOf(resultSet.getString("sexe"));
             	userString[5] = resultSet.getString("email");
             	userString[6] = resultSet.getString("userType");
-            	System.out.println("the user exists");
             	newUser = new User(userString);
                 return true;
             }

@@ -28,8 +28,8 @@ public class Admin extends JFrame implements ActionListener
 	
 	
 	public Admin() {
-		this.genrePanel = new GenrePanel();
-		this.bookPanel = new BooksPanel("");
+		this.genrePanel = new GenrePanel("");
+		this.bookPanel = new BooksPanel("", false);
 		setLayout(new BorderLayout());
 		setIconImage(Controlleur.logo.getImage());
 		setTitle("BookBoutique");
@@ -176,7 +176,7 @@ public class Admin extends JFrame implements ActionListener
 		}
 	}
 	
-	public void removeAndAdd(JPanel addition) {
+	static public void removeAndAdd(JPanel addition) {
 		rightWrapper.removeAll();
 		rightWrapper.add(addition, BorderLayout.CENTER);
 		rightWrapper.revalidate();

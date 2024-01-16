@@ -20,12 +20,16 @@ import BookBoutique.Livre;
 public class BooksPanel extends JPanel implements ActionListener
 {
 	private JButton previous = new JButton("Previous"), next= new JButton("Next");
+	private JButton search;
+	private JTextField searchField;
 	private int pageNumber = 0, numberOfPages, bookCount;
 	private JPanel innerPanel;
 	private String searchTerm;
 	private AddEditBook popUp;
+	private boolean usingSearch;
 	
-	public BooksPanel(String searchTerm) {
+	public BooksPanel(String searchTerm, boolean usingSearch) {
+		this.usingSearch = usingSearch;
 		this.popUp = new AddEditBook();
 		
 		this.searchTerm = searchTerm;
@@ -38,7 +42,6 @@ public class BooksPanel extends JPanel implements ActionListener
 		}
 		
 		this.innerPanel = createInnerPanel(pageNumber);
-		
 		setLayout(new BorderLayout());
 		
 		add(createSearchBar(), BorderLayout.NORTH);
@@ -49,20 +52,27 @@ public class BooksPanel extends JPanel implements ActionListener
 		setVisible(true);
 	}
 	
-	public static JPanel createSearchBar() {
+	public JPanel createSearchBar() {
 		JPanel searchHolder = new JPanel(new FlowLayout(FlowLayout.CENTER));
-		JTextField searchField = new JTextField(80);
-		JButton searchButton = new JButton("Search");
-		
+		searchField = new JTextField(80);
+		search = new JButton("Search");
+
+		search.addActionListener(this);
 		searchHolder.add(searchField);
-		searchHolder.add(searchButton);
+		searchHolder.add(search);
 		return searchHolder;
 	}
 	
 	private JPanel createInnerPanel(int start) {
+		HashMap<String, Livre> books;
 		innerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		JPanel bookHolder = new JPanel(new GridLayout(3, 3, 20, 35));
-		HashMap<String, Livre> books = searchTerm.isEmpty() ? Controlleur.connection.getBooksFromDB("SELECT * FROM books LIMIT " + start + ", 8;") : Controlleur.connection.test(searchTerm, start);
+		if (!usingSearch)
+			books = searchTerm.isEmpty() ? Controlleur.connection.getBooksFromDB("SELECT * FROM books LIMIT " + start + ", 8;") : Controlleur.connection.test(searchTerm, start);
+		else {
+			books = Controlleur.connection.getBooksFromDB("SELECT * FROM books WHERE title LIKE \"%" + searchTerm + "%\"LIMIT " + start + ", 8;");
+			System.out.println(searchTerm);
+		}
 		
 		for (Livre book : books.values()) {
 			RoundedPanel BooksPanel = new RoundedPanel(book.picture, 380, 130, new int[] {20, 15, 80, 100});
@@ -122,6 +132,9 @@ public class BooksPanel extends JPanel implements ActionListener
 				pageNumber++;
 				removeAndAdd(pageNumber == 0 ? 8 : pageNumber * 8);
 			}
+		}
+		else if (e.getSource() == search) {
+			Admin.removeAndAdd(new BooksPanel(searchField.getText(), true));
 		}
 	}
 	
