@@ -3,6 +3,8 @@ package Administrator;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -88,7 +90,6 @@ public class AddEditBook extends JFrame
 		
 		btn.setBounds(x, y, width, height);
 		btn.addActionListener(new ActionListener() {
-
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				codeToRun.run();
@@ -103,6 +104,21 @@ public class AddEditBook extends JFrame
 		textArea.setBounds(x, y, width, height);
 		textArea.setText(areaText);
 		textArea.setBorder(BorderFactory.createEtchedBorder());
+		textArea.setLineWrap(true);
+		textArea.setWrapStyleWord(true);
+		textArea.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyTyped(KeyEvent e) {
+				int max = 500;
+				String text = textArea.getText();
+				if (text.length() >= max) {
+					String shortened = text.substring(0, max - 1);
+					textArea.setText(shortened);
+					e.consume();
+				}
+			}
+		});
+		
 		return textArea;
 	}
 	
@@ -126,7 +142,6 @@ public class AddEditBook extends JFrame
             try {
 				panel.image = ImageIO.read(new File(image));
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
             panel.repaint();
@@ -138,10 +153,8 @@ public class AddEditBook extends JFrame
     public static String copyImageToRessources(File sourceFile) {
     	Path dest = null;
         try {
-            // Obtenir le chemin du dossier ressources dans le projet
             Path folderPath = Paths.get("src\\Images");
 
-            // créer le dossier "ressources"si il n'existe pas
             if (Files.notExists(folderPath)) {
                 Files.createDirectory(folderPath);
             }

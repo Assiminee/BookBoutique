@@ -1,4 +1,4 @@
-The Picture of Dorian Gray;src/bookCovers/ThePictureOfDorianGray.jpg;Oscar Wilde;A novel exploring vanity, decadence, and the consequences of aestheticism;[Classics/Horror];11.75;1
-The Count of Monte Cristo;src/bookCovers/TheCountofMonteCristo.jpeg;Alexandre Dumas;An adventure novel about a man seeking revenge;[Classics/Adventure];13.25;1
-Dracula;src/bookCovers/Dracula.jpg;Bram Stoker;A gothic horror novel about Count Dracula's attempt to move from Transylvania to England;[Classics/Horror];12.0;1
 Pride and Prejudice;src/bookCovers/PrideandPrejudice.jpg;Jane Austen;A classic novel depicting the societal norms of early 19th-century England;[Fiction];9.99;1
+The Count of Monte Cristo;src/bookCovers/TheCountofMonteCristo.jpeg;Alexandre Dumas;An adventure novel about a man seeking revenge;[Classics/Adventure];13.25;1
+The Picture of Dorian Gray;src/bookCovers/ThePictureOfDorianGray.jpg;Oscar Wilde;A novel exploring vanity, decadence, and the consequences of aestheticism;[Classics/Horror];11.75;1
+Dracula;src/bookCovers/Dracula.jpg;Bram Stoker;A gothic horror novel about Count Dracula's attempt to move from Transylvania to England;[Classics/Horror];12.0;1

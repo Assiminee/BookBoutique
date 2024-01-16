@@ -2,6 +2,7 @@ package Administrator;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -22,11 +24,13 @@ import BookBoutique.Livre;
 
 public class GenrePanel extends JPanel implements ActionListener
 {
-	private JButton previous, next;
+	private JButton previous = new JButton("Previous"), next= new JButton("Next");
 	private int pageNumber = 0, numberOfPages, genreCount;
-	private JPanel innerPanel;
+	private JPanel innerPanel, JFWrapper;
+	private JFrame newGenre;
 	
 	public GenrePanel() {
+		this.newGenre = addGenre();
 		this.genreCount = ConnectionDB.getCount("genres");
 		
 		this.numberOfPages = (int) (genreCount / 11);
@@ -41,7 +45,9 @@ public class GenrePanel extends JPanel implements ActionListener
 		
 		add(createSearchBar(), BorderLayout.NORTH);
 		add(innerPanel, BorderLayout.CENTER);
-		add(paginationButtons(), BorderLayout.SOUTH);
+		add(paginationButtons(next, previous, Color.decode("#ff9518"), Color.decode("#ffc218")), BorderLayout.SOUTH);
+		previous.addActionListener(this);
+		next.addActionListener(this);
 		
 		setVisible(true);
 	}
@@ -70,7 +76,7 @@ public class GenrePanel extends JPanel implements ActionListener
 			genrePanel.add(generateButton("Delete", genre, 215, 45, 75, 30));
 			genreHolder.add(genrePanel);
 		}
-		genreHolder.add(addNewPanel(335, 100, new int[] {55, 15, 70, 70}, "Add New Genre", 135, 37, 200, 25, 20, () -> System.out.println("test")));
+		genreHolder.add(addNewPanel(335, 100, new int[] {55, 15, 70, 70}, "Add New Genre", 135, 37, 200, 25, 20, () -> createNewGenrePanel("")));
 		innerPanel.add(genreHolder);
 		
 		return innerPanel;
@@ -112,18 +118,24 @@ public class GenrePanel extends JPanel implements ActionListener
 		});
 		return addPanel;
 	}
-	private JPanel paginationButtons() {
+	
+	static public JPanel paginationButtons(JButton next, JButton previous, Color nextColor, Color previousColor) {
 		JPanel buttonHolder = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 20));
 		
-		previous = new JButton("Previous");
-		next = new JButton("    Next    ");
-		
-		previous.addActionListener(this);
-		next.addActionListener(this);
+		setButtonStyle(next, nextColor);
+		setButtonStyle(previous, previousColor);
 		
 		buttonHolder.add(previous);
 		buttonHolder.add(next);
 		return buttonHolder;
+	}
+	
+	static public void setButtonStyle(JButton btn, Color color) {
+		btn.setPreferredSize(new Dimension(85, 25));
+		btn.setBackground(color);
+		btn.setFocusable(false);
+		btn.setForeground(Color.WHITE);
+		btn.setBorder(BorderFactory.createRaisedBevelBorder());
 	}
 	
 	private JButton generateButton(String buttonLabel, String genre, int x, int y, int width, int height) {
@@ -151,8 +163,8 @@ public class GenrePanel extends JPanel implements ActionListener
 					Admin.rightWrapper.revalidate();
 					Admin.rightWrapper.repaint();
 				}
-				else {
-					
+				else if (buttonLabel.equals("Edit")){
+					createNewGenrePanel(genre);
 				}
 			}
 		};
@@ -182,5 +194,40 @@ public class GenrePanel extends JPanel implements ActionListener
 		add(innerPanel, BorderLayout.CENTER);
 		revalidate();
 		repaint();
+	}
+	
+	private void createNewGenrePanel(String genreTitle) {
+		JFWrapper.removeAll();
+		RoundedPanel genrePanel = new RoundedPanel("", 335, 100, new int[] {});
+		JTextField genre = new JTextField(20);
+		JButton addMod = new JButton("Add/Modify");
+		
+		genrePanel.insertLabel("Genre: ", 20, 20, 70, 30, 20);
+		genre.setBounds(110, 20, 200, 30);
+		addMod.setBounds(115, 60, 100, 25);
+		genre.setText(genreTitle);
+		genrePanel.add(genre);
+		genrePanel.add(addMod);
+		JFWrapper.add(genrePanel);
+		newGenre.revalidate();
+		newGenre.repaint();
+		newGenre.toFront();
+		newGenre.setVisible(true);
+		newGenre.pack();
+		newGenre.setLocationRelativeTo(null);
+	}
+	
+	private JFrame addGenre() {
+		JFrame newGenre = new JFrame();
+		JFWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER));
+		
+		newGenre.setIconImage(Controlleur.logo.getImage());
+		newGenre.setTitle("BookBoutique");
+		newGenre.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		newGenre.setResizable(false);
+		newGenre.setLayout(new FlowLayout(FlowLayout.CENTER));
+		newGenre.add(JFWrapper);
+		newGenre.setVisible(false);
+		return newGenre;
 	}
 }

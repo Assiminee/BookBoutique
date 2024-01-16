@@ -1,0 +1,1 @@
+War and Peace;src/bookCovers/WarAndPeace.jpeg;Leo Tolstoy;An epic novel depicting Russian society during the Napoleonic era;[Classics/Historical Fiction];15.49;1

@@ -3,7 +3,6 @@ package BookBoutique;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
-import java.time.LocalDateTime;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.awt.event.ActionEvent;
@@ -174,10 +173,10 @@ public class AboutUs extends JPanel
 			public void keyTyped(KeyEvent e) {
 				int max = 500;
 				String text = textArea.getText();
-				e.consume();
 				if (text.length() >= max) {
 					String shortened = text.substring(0, max - 1);
 					textArea.setText(shortened);
+					e.consume();
 				}
 			}
 		});
@@ -196,7 +195,7 @@ public class AboutUs extends JPanel
 					!username.getText().isBlank() &&
 					!textArea.getText().isBlank()
 				) {
-					saveUserComment(email.getText(), username.getText(), textArea.getText());
+					EmailService.send("znatni.yasmine@gmail.com", "Comment/question from: " + email.getText(), "Email: " + email.getText() + "\nUsername: " + username.getText() + "\n" + textArea.getText());
 					sent(email);
 					sent(username);
 				}
@@ -234,8 +233,6 @@ public class AboutUs extends JPanel
 	
 	private void sent(JTextField field) {
 		Timer timer = new Timer();
-
-		field.setText("");
 		field.setBackground(Color.decode("#d7ffdd"));
 		timer.schedule(new TimerTask() {
             @Override
@@ -252,28 +249,6 @@ public class AboutUs extends JPanel
             	textArea.setBackground(Color.WHITE);
             }
         }, 2000);
-	}
-	
-	private void saveUserComment(String email, String userName, String comment) {
-        String filePath = "src\\Comments\\" + userName + ".txt";
-        Path file = Paths.get(filePath);
-
-        if (!Files.exists(file)) {
-	        // Use try-with-resources to automatically close the resources
-	        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true))) {
-	            writer.write("Email: " + email + "\nUsername: " + userName + "\n");
-	            System.out.println("Comment has been saved.");
-	        } catch (IOException e) {
-	            System.out.println("An error occurred while writing to the file: " + e.getMessage());
-	        }
-        }
-    	try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true))) {
-        	LocalDateTime currentDateTime = LocalDateTime.now();
-            writer.write(currentDateTime.toString() + "\n" + comment + "\n");
-            System.out.println("Comment has been saved.");
-        } catch (IOException e) {
-            System.out.println("An error occurred while writing to the file: " + e.getMessage());
-        }
 	}
 	
 	

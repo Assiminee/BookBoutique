@@ -19,7 +19,7 @@ import BookBoutique.Livre;
 
 public class BooksPanel extends JPanel implements ActionListener
 {
-	private JButton previous, next;
+	private JButton previous = new JButton("Previous"), next= new JButton("Next");
 	private int pageNumber = 0, numberOfPages, bookCount;
 	private JPanel innerPanel;
 	private String searchTerm;
@@ -43,8 +43,9 @@ public class BooksPanel extends JPanel implements ActionListener
 		
 		add(createSearchBar(), BorderLayout.NORTH);
 		add(innerPanel, BorderLayout.CENTER);
-		add(paginationButton(), BorderLayout.SOUTH);
-		
+		add(GenrePanel.paginationButtons(next, previous, Color.decode("#ff9518"), Color.decode("#ffc218")), BorderLayout.SOUTH);
+		previous.addActionListener(this);
+		next.addActionListener(this);
 		setVisible(true);
 	}
 	
@@ -77,19 +78,6 @@ public class BooksPanel extends JPanel implements ActionListener
 		return innerPanel;
 	}
 	
-	private JPanel paginationButton() {
-		JPanel buttonHolder = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 20));
-		
-		previous = new JButton("Previous");
-		next = new JButton("    Next    ");
-		
-		previous.addActionListener(this);
-		next.addActionListener(this);
-		
-		buttonHolder.add(previous);
-		buttonHolder.add(next);
-		return buttonHolder;
-	}
 	
 	private JButton generateButton(String buttonLabel, String bookTitle, int x, int y, int width, int height) {
 		JButton btn = new JButton();

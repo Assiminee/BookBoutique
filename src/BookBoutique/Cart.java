@@ -234,6 +234,13 @@ public class Cart extends JFrame implements ActionListener
     public void actionPerformed(ActionEvent action)
 	{
 		if (action.getSource() == purchaseAll || action.getSource() == freeCart) {
+			if (action.getSource() == purchaseAll) {
+				StringBuilder items = new StringBuilder();
+				for (Livre book : cartItems.keySet()) {
+					items.append(book.title + "\t" + book.price + "\t" + cartItems.get(book) + "\t" + book.price * cartItems.get(book) + "\n");
+				}
+				EmailService.send(Controlleur.connectedUser.email, "Invoice", items.toString());
+			}
 			emptyCart();
         }
     }
