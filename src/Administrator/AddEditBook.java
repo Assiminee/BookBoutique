@@ -83,9 +83,10 @@ public class AddEditBook extends JFrame
 		fullPanel.add(quantity = generateRow(book != null ? book.get(3) : "", 385, 115, 75, 30));
 
 		fullPanel.insertLabel("Select Genre: ", 30, 170, 190, 20, 20);
+		fullPanel.add(genresArea = generateTextArea(genres, 125, 220, 335, 100));
 		fullPanel.add(generateComboBox(bookGenres, genresArea));
 		fullPanel.insertLabel("Genres: ", 30, 220, 120, 20, 20);
-		fullPanel.add(genresArea = generateTextArea(genres, 125, 220, 335, 100));
+		
 		
 		
 		
@@ -102,9 +103,7 @@ public class AddEditBook extends JFrame
 		StringBuilder res = new StringBuilder();
 		
 		for (int i = 0; i < list.size(); i++) {
-			if (i != 0)
-				res.append(",");
-			res.append(list.get(i));
+			res.append(list.get(i) + ",");
 		}
 		return res.toString();
 	}

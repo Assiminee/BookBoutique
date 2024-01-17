@@ -201,4 +201,45 @@ public class ConnectionDB {
 		searchedBooks.putAll(getBooksFromDB(titleBasedSearchQuery));
 		return searchedBooks;
 	}
+	
+	public ArrayList<String> getSingleUsers(String query) {
+		ArrayList<String> users = new ArrayList<String>();
+		
+		try {
+			Statement stm = con.createStatement();
+			ResultSet rs = stm.executeQuery(query);
+			while (rs.next()) {
+				//users.add(rs.getString(1));
+				users.add(rs.getString(2));
+				users.add(rs.getString(3));
+				users.add(rs.getString(4));
+				users.add(rs.getString(5));
+				users.add(rs.getString(6));
+				users.add(rs.getString(7));
+			}
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return users;
+	}
+	
+	public ArrayList<String> getUsers(String tableName, int start, int count) {
+		ResultSet res;
+		Statement stm;
+		ArrayList<String> entries = new ArrayList<String>();
+		
+		try 
+		{
+			stm = con.createStatement();
+			res = stm.executeQuery("SELECT * FROM " + tableName + " LIMIT " + start + ", " + count);
+			while (res.next()) {
+				entries.add(res.getString(2));
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		return entries;
+	}
 }

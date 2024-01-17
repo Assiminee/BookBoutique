@@ -25,11 +25,13 @@ public class Admin extends JFrame implements ActionListener
 	public static JPanel rightWrapper;
 	GenrePanel genrePanel;
 	BooksPanel bookPanel;
+	UsersPanel usersPanel;
 	
 	
 	public Admin() {
 		this.genrePanel = new GenrePanel("");
 		this.bookPanel = new BooksPanel("", false);
+		this.usersPanel = new UsersPanel();
 		setLayout(new BorderLayout());
 		setIconImage(Controlleur.logo.getImage());
 		setTitle("BookBoutique");
@@ -163,7 +165,7 @@ public class Admin extends JFrame implements ActionListener
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == users) {
-			
+			removeAndAdd(usersPanel);
 		}
 		if (e.getSource() == genres) {
 			removeAndAdd(genrePanel);
